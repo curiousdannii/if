@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>The Z-Machine Standard 1.2 (draft)</title>
+	<style>
+		code { font-size: 16px }
+		td, th { padding: 0.5em; text-align: left; vertical-align: top }
+		th { border-bottom: 1px solid #000 }
+	</style>
+</head>
+<body>
+
+<h1>The Z-Machine Standard 1.2 (draft)</h1>
+<p>Daniel Willis &lt;<a href="mailto:curiousdannii@gmail.com">curiousdannii@gmail.com</a>&gt;
+<p>Permalink: <a href="http://curiousdannii.github.com/if/zspec12.html">http://curiousdannii.github.com/if/zspec12.html</a>
+<p>Status: draft as of 17 August 2010.</p>
+
+<h2 id="introduction">1. Introduction</h2>
+<h3 id="rationale">1.1 Rationale</h3>
+<p>This is a draft proposal for a new standard extension of the Z-Machine. The Z-Machine was first formalised by Graham Nelson, et al. in 1997 <a href="#spec10">[Spec10]</a>. Several attempts were later made to extend the Z-Machine, which were eventually refined down into the 1.1 Standard <a href="#spec11">[Spec11]</a>.
+
+<p>However, effectively the only Z-Machine extension to ever gain traction was the introduction of the unicode opcodes in the 1.0 standard. The 1.1 standard has rarely been fully implemented, possibly in part because there is no way to detect the new opcodes other than by checking whether the VM set the version header to 1.1, which it shouldn't do unless it fully implements the standard. There is no way to partially implement the standard.
+
+<p>This proposal is an attempt to rectify this situation. A new <code>@gestalt</code> testing opcode will be added, following the syntax of Glulx's corresponding opcode <a href="#glulx">[Glulx]</a>. This will allow story files to test for interpreter support of new features and opcodes before using them, with the possibility of using alternative code if they are not.
+
+<p>That is the only change which this standard makes, although an official registry of selectors and the additions they test for is also listed below.
+
+<h3 id="compliance">1.2. Compliance</h3>
+<p>To comply with this standard an implementation must also comply with the 1.0 and 1.1 standards (<a href="#spec10">[Spec10]</a>, <a href="#spec11">[Spec11]</a>). If you ignore the Z-Machine version 6 then the changes required by the 1.1 standard are quite limited and extending a 1.0 interpreter to both 1.1 and 1.2 should not be a large task.
+
+<p>An implementation of this standard will set the Standard revision number header (address <code>$32</code>) to <code>$0102</code>. It will add the <code>@gestalt</code> opcode, as detailed <a href="#gestalt">below</a>, and will support the core selectors, as explained in the <a href="#registry">selector registry</a>.
+
+<p>Praxix <a href="#praxix">[Praxix]</a> is a Z-Machine unit test which includes tests for this standard. Implementors should check that their implementation passes all the tests it performs.
+
+<h2 id="gestalt">2. @gestalt</h2>
+<p>The @gestalt opcode has the following specification:
+<p><code>@"EXT:30S" id arg -> (result);</code>
+
+<p>This will test for the selector <code>id</code>, with the optional argument <code>arg</code>, storing the result in the variable specified. If a certain selector does not need the optional argument, set it to <code>0</code>.
+
+<p>If a selector is set which the interpreter doesn't recognise, then <code>0</code> will be stored. What a selector will do with an argument it doesn't recognise is up to that selector; see the <a href="#registry">registry</a> for details.
+
+<p>Before using the <code>@gestalt</code> opcode, ensure that you are using an 1.2 standard interpreter by checking whether the Standard revision number header (address <code>$32</code>) is at least <code>$0102</code>.
+
+<h2 id="registry">3. Selector registry</h2>
+
+<p>The following is an official list of selectors. If you would like to reserve a selector for your own extensions, please contact <a href="mailto:curiousdannii@gmail.com">the author</a>.
+
+<table>
+	<tr><th>Selector id</th><th>Title</th><th>Description</th></tr>
+	<tr><td>1</td><td>Standard Version</td><td><b>Core</b>: stores the Z-Machine standard which this interpreter supports. Should be $0102 or higher.</td></tr>
+	<tr><td><code>$F000-$FFFF</code></td><td>Private use</td><td>Selectors in this range will never be specified, and are free for use in custom interpreters. As in previous standards, opcodes <code>EXT:128</code> to <code>EXT:255</code> are available for custom interpreters, and you may use one of these selectors to test whether the story file is being run in your interpreter. Please consider though whether there might be value in standardising your extension for others to use.</td></tr>
+</table>
+
+<h2 id="references">References</h2>
+<dl>
+	<dt><a id="glulx">[Glulx]</a></dt>
+	<dd><cite><a href="http://www.eblong.com/zarf/glulx/glulx-spec.html">Glulx - VM specification version 3.1.2.</a></cite> 2010. Andrew Plotkin.</dd>
+
+	<dt><a id="praxix">[Praxix]</a></dt>
+	<dd><cite>Praxix - a Z-Machine unit test.</cite> 2010. Zarf and Dannii. Hosted at the <a href="http://github.com/curiousdannii/gnusto">Gnusto Github</a>: <a href="http://github.com/curiousdannii/gnusto/raw/master/tests/praxix.inf">source code</a>/<a href="http://github.com/curiousdannii/gnusto/raw/master/tests/praxix.z5">compiled zcode</a>.</dd>
+
+	<dt><a id="spec10">[Spec10]</a></dt>
+	<dd><cite><a href="http://www.inform-fiction.org/zmachine/standards/z1point0/index.html">The Z-Machine Standards Document - Version 1.0.</a></cite> 1997. Graham Nelson, et al.</dd>
+	
+	<dt><a id="spec11">[Spec11]</a></dt>
+	<dd><cite><a href="http://www.jczorkmid.net/~jpenney/ZSpec11-latest.txt">Z-Machine Standard 1.1 Document.</a></cite> 2006. Kevin Bracey, Jason C. Penney, David Kinder.</dd>
+</dl>
+
+</body>
+</html>
