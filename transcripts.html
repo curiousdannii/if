@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>IF Transcripts Protocol (draft)</title>
+	<link rel="stylesheet" href="if.css">
+</head>
+<body>
+
+<h1>IF Transcripts Protocol (draft)</h1>
+<p>Dannii Willis &lt;<a href="mailto:curiousdannii@gmail.com">curiousdannii@gmail.com</a>&gt;
+<p>Permalink: <a href="http://curiousdannii.github.com/if/transcripts.html">http://curiousdannii.github.com/if/transcripts.html</a>
+<p>Status: draft as of 12 September 2010.</p>
+
+<h2 id="introduction">1. Introduction</h2>
+<blockquote>Anyone who's spent more than a minute on interactive fiction knows the default responses; make it days and you'll know them by heart. "Taken." "You can't go that way." "You find nothing of interest." They seem simple, but they're one of IF's biggest PR problems. Just about every mainstream (for a certain value) portrayal of the medium focuses on parser responses. It isn't to praise them. … [It] touches on two big problems with default parser messages: some of them mislead the player, and most of them interfere with a game's writing. If we want to expand IF's audience, we need to look at what our work says to them. <a href="#morayati">[Morayati]</a></blockquote>
+
+<p>It would greatly assist authors if there was a way to easily collect transcripts from testers which automatically highlighted potential problems in their works. This standard proposes a set of technologies which should be simple enough to widely implement, while informative enough to be useful.
+
+<p>The basic system will involve interpreters periodically sending logs of a player's input and the story file's responses to a web server. New interpreters will be able to also send more specific information about error and parser messages for story files which are compiled to do so.
+
+<h2 id="ifiction">2. iFiction metadata extension</h2>
+<p>A custom interpreter may be set up for sending transcripts, or the transcript server may have been specified with a querystring parameter (for web interpreters). But in most cases it will be useful to keep the server address with the story file itself, so that it may be used with any interpreter which supports sending transcripts. A small extension to the iFiction XML record is proposed, which in most cases will be included in blorbed story files <a href="#babel">[Babel]</a>. The following <code>&lt;transcripts&gt;</code> element should be added as a child node of <code>&lt;story&gt;</code>.
+
+<pre><code>&lt;transcripts&gt;
+	&lt;url&gt;URL&lt;/url&gt;
+	&lt;lastdate>DATE&lt;/lastdate&gt;
+&lt;/transcripts&gt;</code></pre>
+
+<p><code>&lt;url&gt;</code> must use the HTTP protocol, and <code>&lt;lastdate&gt;</code> must be in the format of "3-letter-month-name day, four-digit-year" eg, "Aug 9, 2010". The <code>&lt;lastdate&gt;</code> is required so that interpreters won't attempt to send transcripts long after the author has stopped wanting them (or after the web server has been taken offline). It may be set to many years or even centuries into the future (but don't do that unless you can guarantee your server's uptime!)
+
+<h2 id="tags">3. Tagged responses</h2>
+<p>Juhana experimented with tagging error and parser messages to send to a transcripts server, and we will follow his lead, although with a slightly different syntax <a href="#juhana">[Juhana]</a>. A story file will print out a response's tags, which will then be stripped out by the interpreter so that the user does not see them. Multiple tags can be sent with each response, though they should be sent together, using the following syntax.
+
+<p><code>#{TAG:DATA;TAG2:DATA2}#</code>
+
+<!-- Can library messages only be determined at the end of a response? If multiple messages need to be tagged at once, should we support that? -->
+
+<p>The following table shows the suggested response tags. A story file may send other tags, but unless a custom interpreter is used they will just be ignored. Tag names are case insensitive.
+
+<table>
+	<tr><th>Tag name</th><th>Use</th></tr>
+	
+	<tr><td>type</td><td>Used to indicate the response type. Suggested types are "libmsg" for library messages, "parser" for parser errors and "runtime" for runtime errors.</td></tr>
+	
+	<tr><td>code</td><td>Most errors and library messages have indentifying codes, and this tag should be used to specify it.</td></tr>
+	
+	<tr><td>status</td><td>It may be useful to share more than the status line currently shows, so this tag can be used to send other variables. Of course this will make those variables fairly easily accessible to the user.</td></tr>
+</table>
+
+<p>These response tags are printed to the default stream, so to prevent users with old interpreters seeing them a story file must first check that the interpreter supports tagged responses. For Glulx, check the <code>@gestalt</code> selector <code>$1100</code> <a href="#glulx">[Glulx]</a>. If a Z-Machine supports the new version 1.2 proposal, check the <code>@gestalt</code> selector <code>$10</code> <a href="#spec12">[Spec12]</a>. If <code>@gestalt</code> returns <code>0</code> it is unsafe to print message tags.
+
+<h2 id="references">References</h2>
+<dl>
+	<dt><a id="babel">[Babel]</a></dt>
+	<dd><cite><a href="http://babel.ifarchive.org/babel_rev7.txt">The Treaty of Babel.</a></cite> 2006. L. Ross Raszewski, et al.</dd>
+
+	<dt><a id="glulx">[Glulx]</a></dt>
+	<dd><cite><a href="http://www.eblong.com/zarf/glulx/glulx-spec.html">Glulx - VM specification version 3.1.2.</a></cite> 2010. Andrew Plotkin.</dd>
+
+	<dt><a id="juhana">[Juhana]</a></dt>
+	<dd><cite><a href="http://nitku.net/blog/2010/06/collecting-real-life-gameplay-data-with-parchment/">Undo Restart Restore: Collecting real life gameplay data with Parchment.</a></cite> 2010. Juhana Leinonen.</dd>
+
+	<dt><a id="morayati">[Morayati]</a></dt>
+	<dd><cite><a href="http://selfasfractal.blogspot.com/2010/06/default-parser-messages-do-they-need.html">Self as Fractal: Default parser messages: do they need an overhaul?</a></cite> 2010. Sarah Morayati.</dd>
+
+	<dt><a id="spec12">[Spec12]</a></dt>
+	<dd><cite><a href="http://curiousdannii.github.com/if/zspec12.html">The Z-Machine Standard 1.2.</a></cite> 2010. Dannii Willis.</dd>
+</dl>
+
+</body>
+</html>
