@@ -1,0 +1,46 @@
+! @parchment tests
+! by Dannii
+
+Constant HDR_SPECREVISION  $32;
+
+[ Version;
+	! Print the version number
+	print HDR_SPECREVISION->0, ".", HDR_SPECREVISION->1;
+];
+
+[ Main val ;
+	print "Testing @@64parchment^^";
+	
+	Test();
+	
+	@read_char 1 -> val;
+];
+
+[ Test val ;
+	! Check we're in a 1.2 version interpreter
+	val = HDR_SPECREVISION-->0;
+	if (val < $0102)
+	{
+		print "Stopping, interpreter is only version "; Version(); print ".^";
+		return;
+	}
+	
+	print "Ok, interpreter is version "; Version(); print ".^^";
+
+	! Checking non-existant selector
+	@"EXT:30S" $20 0 -> val;
+	if ( val == 0 )
+	{
+		print "Stopping, no support for @@64parchment.^";
+		return;
+	}
+
+	@"EXT:30S" $20 1 -> val;
+	if ( val == 1 )
+	{
+		print "Raw eval() mode is supported.^";
+		@"EXT:31S" 1 1 -> val;
+		print "alert(~Raw eval() mode is supported.~);";
+		@"EXT:31S" 1 0 -> val;
+	}
+];
