@@ -3,44 +3,98 @@
 
 Constant HDR_SPECREVISION  $32;
 
+Global gg_mainwin = 0;
+Array gg_event --> 4;
+
+[ Main val done;
+
+	#Ifdef TARGET_GLULX;
+		@setiosys 2 0; ! select Glk I/O system
+
+		! Open a text-buffer window, and select it as the current output stream.
+		gg_mainwin = glk($0023, 0, 0, 0, 3, 0); ! glk_window_open
+		glk($002F, gg_mainwin); ! glk_set_window
+	#Endif; ! TARGET_GLULX
+
+	print "@@64parchment tests^^";
+	
+	Test();
+	
+	#Ifdef TARGET_ZCODE;
+		@read_char 1 -> val;
+	#Ifnot; ! TARGET_GLULX
+        done = false;
+        glk($00D2, gg_mainwin); ! request_char_event
+        while (~~done) {
+            glk($00C0, gg_event); ! select
+            switch (gg_event-->0) {
+                2: ! evtype_CharInput
+                    if (gg_event-->1 == gg_mainwin)
+                        done = true;
+            }
+        }
+	#Endif; ! TARGET_
+
+];
+
 [ Version;
 	! Print the version number
 	print HDR_SPECREVISION->0, ".", HDR_SPECREVISION->1;
 ];
 
-[ Main val ;
-	print "Testing @@64parchment^^";
+[ Gestalt zid gid arg val;
+
+	! Check a gestalt value
+	#Ifdef TARGET_ZCODE;
+		@"EXT:30S" zid arg -> val;
+	#Ifnot; ! TARGET_GLULX
+		@gestalt gid arg val;
+	#Endif; ! TARGET_
 	
-	Test();
-	
-	@read_char 1 -> val;
+	return val;
 ];
 
 [ Test val ;
-	! Check we're in a 1.2 version interpreter
-	val = HDR_SPECREVISION-->0;
-	if (val < $0102)
-	{
-		print "Stopping, interpreter is only version "; Version(); print ".^";
-		return;
-	}
 	
-	print "Ok, interpreter is version "; Version(); print ".^^";
+	#Ifdef TARGET_ZCODE;
+		! Check we're in a 1.2 version interpreter
+		val = HDR_SPECREVISION-->0;
+		if (val < $0102)
+		{
+			print "Stopping, interpreter is only version "; Version(); print ".^";
+			return;
+		}
+	
+		print "Ok, interpreter is version "; Version(); print ".^^";
+	#Endif; ! TARGET_ZCODE
 
-	! Checking non-existant selector
-	@"EXT:30S" $20 0 -> val;
-	if ( val == 0 )
+	! Checking for @parchment support
+	if ( Gestalt($20, $1110, 0) == 0 )
 	{
 		print "Stopping, no support for @@64parchment.^";
 		return;
 	}
+	print "Ok, @@64parchment is supported.^^";
 
-	@"EXT:30S" $20 1 -> val;
-	if ( val == 1 )
+	! Check for raw eval() support
+	if ( Gestalt($20, $1110, 1) == 1 )
 	{
 		print "Raw eval() mode is supported.^";
-		@"EXT:31S" 1 1 -> val;
+		
+		#Ifdef TARGET_ZCODE;
+			@"EXT:31S" 1 1 -> val;
+		#Ifnot; ! TARGET_GLULX
+			@"S3:4368" 1 1 val;
+		#Endif; ! TARGET_
+		
 		print "alert(~Raw eval() mode is supported.~);";
-		@"EXT:31S" 1 0 -> val;
+		
+		#Ifdef TARGET_ZCODE;
+			@"EXT:31S" 1 0 -> val;
+		#Ifnot; ! TARGET_GLULX
+			@"S3:4368" 1 0 val;
+		#Endif; ! TARGET_
 	}
+	else
+		print "Raw eval() mode is not supported.^";
 ];
