@@ -54,6 +54,18 @@ Array gg_event --> 4;
 	return val;
 ];
 
+[ Parchment id arg val;
+
+	! @parchment wrapper
+	#Ifdef TARGET_ZCODE;
+		@"EXT:31S" id arg -> val;
+	#Ifnot; ! TARGET_GLULX
+		@"S3:4368" id arg val;
+	#Endif; ! TARGET_
+	
+	return val;
+];
+
 [ Test val ;
 	
 	#Ifdef TARGET_ZCODE;
@@ -81,19 +93,11 @@ Array gg_event --> 4;
 	{
 		print "Raw eval() mode is supported.^";
 		
-		#Ifdef TARGET_ZCODE;
-			@"EXT:31S" 1 1 -> val;
-		#Ifnot; ! TARGET_GLULX
-			@"S3:4368" 1 1 val;
-		#Endif; ! TARGET_
+		Parchment(1, 1);
 		
 		print "alert(~Raw eval() mode is supported.~);";
 		
-		#Ifdef TARGET_ZCODE;
-			@"EXT:31S" 1 0 -> val;
-		#Ifnot; ! TARGET_GLULX
-			@"S3:4368" 1 0 val;
-		#Endif; ! TARGET_
+		Parchment(1, 0);
 	}
 	else
 		print "Raw eval() mode is not supported.^";
