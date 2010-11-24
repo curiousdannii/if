@@ -1,4 +1,4 @@
-! @parchment tests
+! @parchment examples and unit tests
 ! by Dannii
 
 Constant HDR_SPECREVISION  $32;
@@ -23,16 +23,16 @@ Array gg_event --> 4;
 	#Ifdef TARGET_ZCODE;
 		@read_char 1 -> val;
 	#Ifnot; ! TARGET_GLULX
-        done = false;
-        glk($00D2, gg_mainwin); ! request_char_event
-        while (~~done) {
-            glk($00C0, gg_event); ! select
-            switch (gg_event-->0) {
-                2: ! evtype_CharInput
-                    if (gg_event-->1 == gg_mainwin)
-                        done = true;
-            }
-        }
+		done = false;
+		glk($00D2, gg_mainwin); ! request_char_event
+		while (~~done) {
+			glk($00C0, gg_event); ! select
+			switch (gg_event-->0) {
+				2: ! evtype_CharInput
+					if (gg_event-->1 == gg_mainwin)
+						done = true;
+			}
+		}
 	#Endif; ! TARGET_
 
 ];
@@ -89,7 +89,10 @@ Array gg_event --> 4;
 	print "Ok, @@64parchment is supported.^^";
 
 	! Check for raw eval() support
-	if ( Gestalt($20, $1110, 1) == 1 )
+	if ( Gestalt($20, $1110, 1) == 0 )
+		print "Raw eval() mode is not supported.^";
+		
+	else
 	{
 		print "Raw eval() mode is supported.^";
 		
@@ -99,6 +102,5 @@ Array gg_event --> 4;
 		
 		Parchment(1, 0);
 	}
-	else
-		print "Raw eval() mode is not supported.^";
+
 ];

@@ -27,7 +27,7 @@
 	&lt;lastdate>DATE&lt;/lastdate&gt;
 &lt;/transcripts&gt;</code></pre>
 
-<p><code>&lt;url&gt;</code> must use the HTTP protocol, and <code>&lt;lastdate&gt;</code> must be in the format of "3-letter-month-name day, four-digit-year" eg, "Aug 9, 2010". The <code>&lt;lastdate&gt;</code> is required so that interpreters won't attempt to send transcripts long after the author has stopped wanting them (or after the web server has been taken offline). It may be set to many years or even centuries into the future (but don't do that unless you can guarantee your server's uptime!)
+<p><code>&lt;url&gt;</code> must use the HTTP protocol, and <code>&lt;lastdate&gt;</code> must be in the format of "3-letter-month-name day, four-digit-year" e.g., "Aug 9, 2010". The <code>&lt;lastdate&gt;</code> is required so that interpreters won't attempt to send transcripts long after the author has stopped wanting them (or after the web server has been taken offline). It may be set to many years or even centuries into the future (but don't do that unless you can guarantee your server's uptime!)
 
 <h2 id="tags">3. Tagged responses</h2>
 <p>Juhana experimented with tagging error and parser messages to send to a transcripts server, and we will follow his lead, although with a slightly different syntax <a href="#juhana">[Juhana]</a>. A story file will print out a response's tags, which will then be stripped out by the interpreter so that the user does not see them. Multiple tags can be sent with each response, though they should be sent together, using the following syntax.

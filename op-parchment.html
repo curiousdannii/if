@@ -10,7 +10,7 @@
 <h1>@parchment</h1>
 <p>Dannii Willis &lt;<a href="mailto:curiousdannii@gmail.com">curiousdannii@gmail.com</a>&gt;
 <p>Permalink: <a href="http://curiousdannii.github.com/if/op-parchment.html">http://curiousdannii.github.com/if/op-parchment.html</a>
-<p>Status: draft as of 1 November 2010.</p>
+<p>Status: draft as of 17 November 2010.</p>
 
 <h2>Introduction</h2>
 <p><code>@parchment</code> is a new opcode for the Z-Machine version 1.2 and Glulx, which has a number of experimental functions for use with the Parchment web interpreter <a href="#parchment">[Parchment]</a>. It is used for testing functionality which is not yet stable enough to be formally standardised. Any use of <code>@parchment</code> is at your own risk!
@@ -22,10 +22,10 @@
 <p>The <code>@parchment</code> opcode has the following specification:
 <p><code>@parchment id arg -> (result);</code>
 
-<p>This will perform function <code>id</code> with optional argument <code>arg</code>, possibly storing a result in <code>result</code>. Not all functions will specify a result; the rest will store <code>0</code>. For Glulx the opcode number is <code>$1110</code> <a href="#glulx">[Glulx]</a>. If the Z-Machine supports the new version 1.2 proposal, the opcode used is <code>EXT:31</code> <a href="#spec12">[Spec12]</a>.
+<p>This will perform function <code>id</code> with optional argument <code>arg</code>, possibly storing a result in <code>result</code>. Not all functions will specify a result; the rest will store <code>0</code>. For Glulx the opcode number is <code>$1110</code> with assembly code <code>@"S3:4368"</code> <a href="#glulx">[Glulx]</a>. If the Z-Machine supports the new version 1.2 proposal, the opcode used is <code>EXT:31</code> with assembly code <code>@"EXT:31S"</code> <a href="#spec12">[Spec12]</a>.
 
-<h2>Tests</h2>
-<p>Tests are available for <code>@parchment</code>: <a href="tests/op-parchment.inf">source code</a>, <a href="tests/op-parchment.z5">compiled zcode</a>, <a href="tests/op-parchment.ulx">compiled Glulx code</a>.
+<h2>Examples and unit tests</h2>
+<p>Examples/tests are available for <code>@parchment</code>: <a href="http://github.com/curiousdannii/if/raw/gh-pages/tests/op-parchment.inf">source code</a>, <a href="tests/op-parchment.z5">compiled zcode</a>, <a href="tests/op-parchment.ulx">compiled Glulx code</a>.
 
 <h2>Functions</h2>
 <table>

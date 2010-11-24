@@ -3,14 +3,14 @@
 <head>
 	<meta charset="utf-8">
 	<title>The Z-Machine Standard 1.2 (draft)</title>
-	<link rel="stylesheet" href="if.css">
+	<link rel="stylesheet" href="http://curiousdannii.github.com/if/if.css">
 </head>
 <body>
 
 <h1>The Z-Machine Standard 1.2 (draft)</h1>
 <p>Dannii Willis &lt;<a href="mailto:curiousdannii@gmail.com">curiousdannii@gmail.com</a>&gt;
 <p>Permalink: <a href="http://curiousdannii.github.com/if/zspec12.html">http://curiousdannii.github.com/if/zspec12.html</a>
-<p>Status: draft as of 1 November 2010.</p>
+<p>Status: draft as of 17 November 2010.</p>
 
 <h2 id="introduction">1. Introduction</h2>
 <h3 id="rationale">1.1 Rationale</h3>
@@ -18,14 +18,14 @@
 
 <p>However, effectively the only Z-Machine extension to ever gain traction was the introduction of the unicode opcodes in the 1.0 standard. The 1.1 standard has rarely been fully implemented, possibly in part because there is no way to detect the new opcodes other than by checking whether the interpreter set the standard revision header to signify 1.1, which it shouldn't do unless it fully implements the standard. There is no way to partially implement the standard.
 
-<p>This proposal is an attempt to rectify this situation. A new <code>@gestalt</code> testing opcode will be added, following the syntax of Glulx's corresponding opcode <a href="#glulx">[Glulx]</a>. This will allow story files to test for interpreter support of new features and opcodes before using them, with the possibility of using alternative code if they are not.
+<p>This proposal is an attempt to rectify this situation. A new <code>@gestalt</code> testing opcode will be added, following the syntax of Glulx's cognate opcode <a href="#glulx">[Glulx]</a>. This will allow story files to test for interpreter support of new features and opcodes before using them, with the possibility of using alternative code if they are not.
 
-<p>That is the only change which this standard directly makes, although an official registry of selectors and the additions they test for is listed below.
+<p>That is the only change which this standard directly makes, although an official registry of selectors and the additions they test for is listed below. There may be a need for further clarifications or even corrections to the 1.0 and 1.1 standards, but those should be considered orthogonal to this standard.
 
 <h3 id="compliance">1.2. Compliance</h3>
-<p>To comply with this standard an implementation must also comply with the 1.0 and 1.1 standards (<a href="#spec10">[Spec10]</a>, <a href="#spec11">[Spec11]</a>). If you ignore the Z-Machine version 6 then the changes required by the 1.1 standard are quite limited and extending a 1.0 interpreter to both 1.1 and 1.2 should not be a large task.
-
 <p>An implementation of this standard will set the standard revision header (address <code>$32</code>) to <code>$0102</code>. It will add the <code>@gestalt</code> opcode, as detailed below, and will support the core selectors, as listed in the selector registry.
+
+<p>To comply with this standard an implementation must also comply with the 1.0 and 1.1 standards, as they are written at the time of the publication of this standard (<a href="#spec10">[Spec10]</a>, <a href="#spec11">[Spec11]</a>). If you ignore the Z-Machine version 6 then the changes required by the 1.1 standard are quite limited and extending a 1.0 interpreter to both 1.1 and 1.2 should not be a large task. If at some future time further revisions are made to either the 1.0 or 1.1 standards, it should not be assumed that an interpreter which sets the standard revision header to <code>$0102</code> also complies with those new revisions. As this could prove quite confusing, it is recommended that any further work on the 1.0 or 1.1 standards should be accompanied by selectors to check for compliance.
 
 <p>Praxix is a Z-Machine unit test which includes tests for this standard <a href="#praxix">[Praxix]</a>. Implementors should check that their implementation passes all the tests it performs.
 
