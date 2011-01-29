@@ -3,6 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<title>The Z-Machine Standard 1.2 (draft)</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+	<script src="http://curiousdannii.github.com/if/if.js"></script>
 	<link rel="stylesheet" href="http://curiousdannii.github.com/if/if.css">
 </head>
 <body>
@@ -10,7 +12,7 @@
 <h1>The Z-Machine Standard 1.2 (draft)</h1>
 <p>Dannii Willis &lt;<a href="mailto:curiousdannii@gmail.com">curiousdannii@gmail.com</a>&gt;
 <p>Permalink: <a href="http://curiousdannii.github.com/if/zspec12.html">http://curiousdannii.github.com/if/zspec12.html</a>
-<p>Status: draft as of 17 November 2010.</p>
+<p>Status: draft as of 29 January 2011.</p>
 
 <h2 id="introduction">1. Introduction</h2>
 <h3 id="rationale">1.1 Rationale</h3>
@@ -20,12 +22,12 @@
 
 <p>This proposal is an attempt to rectify this situation. A new <code>@gestalt</code> testing opcode will be added, following the syntax of Glulx's cognate opcode <a href="#glulx">[Glulx]</a>. This will allow story files to test for interpreter support of new features and opcodes before using them, with the possibility of using alternative code if they are not.
 
-<p>That is the only change which this standard directly makes, although an official registry of selectors and the additions they test for is listed below. There may be a need for further clarifications or even corrections to the 1.0 and 1.1 standards, but those should be considered orthogonal to this standard.
+<p>That is the only change which this standard directly makes, although an official registry of selectors and the additions they test for is listed below. Some of the selectors may be used to identify which of several conflicting interpretations of the previous standards has been implemented in an interpreter, but they do not require that one interpretation be implemented over another.
 
 <h3 id="compliance">1.2. Compliance</h3>
 <p>An implementation of this standard will set the standard revision header (address <code>$32</code>) to <code>$0102</code>. It will add the <code>@gestalt</code> opcode, as detailed below, and will support the core selectors, as listed in the selector registry.
 
-<p>To comply with this standard an implementation must also comply with the 1.0 and 1.1 standards, as they are written at the time of the publication of this standard (<a href="#spec10">[Spec10]</a>, <a href="#spec11">[Spec11]</a>). If you ignore the Z-Machine version 6 then the changes required by the 1.1 standard are quite limited and extending a 1.0 interpreter to both 1.1 and 1.2 should not be a large task. If at some future time further revisions are made to either the 1.0 or 1.1 standards, it should not be assumed that an interpreter which sets the standard revision header to <code>$0102</code> also complies with those new revisions. As this could prove quite confusing, it is recommended that any further work on the 1.0 or 1.1 standards should be accompanied by selectors to check for compliance.
+<p>To comply with this standard an implementation must also comply with the 1.0 and 1.1 standards, as they are written at the time of the publication of this standard <a href="#spec10">[Spec10]</a> <a href="#spec11">[Spec11]</a>. If you ignore the Z-Machine version 6 then the changes required by the 1.1 standard are quite limited and extending a 1.0 interpreter to both 1.1 and 1.2 should not be a large task. As noted above, there are unfortunately some areas of the previous standards which have been interpreted differently by implementation writers. Because of that some selectors may be used to identify which interpretation has been implemented in the interpreter.
 
 <p>Praxix is a Z-Machine unit test which includes tests for this standard <a href="#praxix">[Praxix]</a>. Implementors should check that their implementation passes all the tests it performs.
 
@@ -48,39 +50,38 @@
 	
 	<tr><td>Standard version</td><td><code>$01</code></td><td>-</td><td><b>Core</b>: stores the Z-Machine standard which this interpreter supports. Will be <code>$0102</code> or higher.</td></tr>
 
-	<tr><td>Transcripts Protocol</td><td><code>$10</code></td><td>-</td><td>Specifies whether the interpreter supports tagged responses. See <a href="#transcripts">[Transcripts]</a>.</td></tr>
+	<tr><td>Transcripts Protocol</td><td><code>$10</code></td><td>-</td><td>Specifies whether the interpreter supports tagged responses. <a href="#transcripts">[Transcripts]</a></td></tr>
 	
-	<tr><td>@parchment</td><td><code>$20</code></td><td><code>EXT:31</code></td><td>Support for @parchment. See <a href="#op-parchment">[@Parchment]</a>.</td></tr>
+	<tr><td>@parchment</td><td><code>$20</code></td><td><code>EXT:31</code></td><td>Support for <code>@parchment</code>. <a href="#op-parchment">[@Parchment]</a></td></tr>
 	
 	<tr><td>Zoom profiling</td><td><code>$1000</code></td><td><code>EXT:128-131</code></td><td>Provides opcodes for accessing the system timer. For more details see Zoom's README <a href="#zoom">[Zoom]</a>.</td></tr>
 	
 	<tr><td>Zoom stack dump</td><td><code>$1001</code></td><td><code>EXT:132</code></td><td>Prints out a stack dump. For more details see Zoom's implementation (src/zmachine.c: zmachine_dump_stack()) <a href="#zoom">[Zoom]</a>.</td></tr>
 	
+	<tr><td>@set_font 0</td><td><code>$2000</code></td><td><code>EXT:4</code></td><td><b>Core</b>: clarification for <code>@set_font 0</code>. Set to which of the following is implemented:<ol><li>not supported</li><li>no change, and return the current font</li><li>change to the second last font, and return it</li></ol></td></tr>
+	
+	<tr><td>Streams 3/4</td><td><code>$2001</code></td><td>-</td><td><b>Core</b>: clarification for when streams 3 and 4 are supported. Set to which of the following is implemented:<ol><li>V3 and higher</li><li>V5 and higher</li></ol></td></tr>
+	
+	<tr><td>@call_vs2</td><td><code>$2002</code></td><td><code>VAR:224</code></td><td><b>Core</b>: clarification for how many arguments are allowed in V4 for <code>@call_vs2</code>. Set to which of the following is implemented:<ol><li>0-3</li><li>0-7</li></ol></td></tr>
+	
 	<tr><td>Private use</td><td><code>$F000-$FFFF</code></td><td><code>EXT:133-255</code></td><td>Selectors in this range will never be specified, and are free for use in custom interpreters. As in previous standards, opcodes <code>EXT:133-255</code> are available for custom interpreters, and you may use one of these selectors to test whether the story file is being run in your interpreter (pick one at random). Please consider though whether there might be value in standardising your extension for others to use.</td></tr>
 </table>
 
 <h2 id="references">References</h2>
-<dl>
-	<dt><a id="glulx">[Glulx]</a></dt>
-	<dd><cite><a href="http://www.eblong.com/zarf/glulx/glulx-spec.html">Glulx - VM specification version 3.1.2.</a></cite> 2010. Andrew Plotkin.</dd>
+<ol class="references">
+	<li id="glulx"><a>[Glulx]</a><cite> <a href="http://www.eblong.com/zarf/glulx/glulx-spec.html">Glulx - VM specification version 3.1.2.</a></cite> 2010. Andrew Plotkin.</li>
 
-	<dt><a id="op-parchment">[@Parchment]</a></dt>
-	<dd><cite><a href="http://curiousdannii.github.com/if/op-parchment.html">@parchment.</a></cite> 2010. Dannii Willis.</dd>
+	<li id="op-parchment"><a>[@Parchment]</a> <cite><a href="http://curiousdannii.github.com/if/op-parchment.html">@parchment.</a></cite> 2010. Dannii Willis.</li>
 
-	<dt><a id="praxix">[Praxix]</a></dt>
-	<dd><cite>Praxix - a Z-Machine unit test.</cite> 2010. Zarf and Dannii. Hosted at the <a href="http://github.com/curiousdannii/gnusto">Gnusto Github</a>: <a href="http://github.com/curiousdannii/gnusto/raw/master/tests/praxix.inf">source code</a>/<a href="http://github.com/curiousdannii/gnusto/raw/master/tests/praxix.z5">compiled zcode</a>.</dd>
+	<li id="praxix"><a>[Praxix]</a> <cite>Praxix - a Z-Machine unit test.</cite> 2010. Zarf and Dannii. Hosted at the <a href="http://github.com/curiousdannii/gnusto">Gnusto Github</a>: <a href="http://github.com/curiousdannii/gnusto/raw/master/tests/praxix.inf">source code</a>/<a href="http://github.com/curiousdannii/gnusto/raw/master/tests/praxix.z5">compiled zcode</a>.</li>
 
-	<dt><a id="spec10">[Spec10]</a></dt>
-	<dd><cite><a href="http://www.inform-fiction.org/zmachine/standards/z1point0/index.html">The Z-Machine Standards Document - Version 1.0.</a></cite> 1997. Graham Nelson, et al.</dd>
+	<li id="spec10"><a>[Spec10]</a> <cite><a href="http://www.inform-fiction.org/zmachine/standards/z1point0/index.html">The Z-Machine Standards Document - Version 1.0.</a></cite> 1997. Graham Nelson, et al.</li>
 	
-	<dt><a id="spec11">[Spec11]</a></dt>
-	<dd><cite><a href="http://ifarchive.org/if-archive/infocom/interpreters/specification/ZSpec11.txt">Z-Machine Standard 1.1 Document.</a></cite> 2006. Kevin Bracey, Jason C. Penney, David Kinder.</dd>
+	<li id="spec11"><a>[Spec11]</a> <cite><a href="http://ifarchive.org/if-archive/infocom/interpreters/specification/ZSpec11.txt">Z-Machine Standard 1.1 Document.</a></cite> 2006. Kevin Bracey, Jason C. Penney, David Kinder.</li>
 
-	<dt><a id="transcripts">[Transcripts]</a></dt>
-	<dd><cite><a href="http://curiousdannii.github.com/if/transcripts.html">IF Transcripts Protocol.</a></cite> 2010. Dannii Willis.</dd>
+	<li id="transcripts"><a>[Transcripts]</a> <cite><a href="http://curiousdannii.github.com/if/transcripts.html">IF Transcripts Protocol.</a></cite> 2010. Dannii Willis.</li>
 
-	<dt><a id="zoom">[Zoom]</a></dt>
-	<dd><cite><a href="http://www.logicalshift.co.uk/unix/zoom/">Zoom - Z-Machine interpreter.</a></cite> 2009. Andrew Hunter.</dd>
+	<li id="zoom"><a>[Zoom]</a> <cite><a href="http://www.logicalshift.co.uk/unix/zoom/">Zoom - Z-Machine interpreter.</a></cite> 2009. Andrew Hunter.</li>
 </dl>
 
 </body>
