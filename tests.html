@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<title>IF unit tests</title>
 	<link rel="stylesheet" href="if.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js></script>
 	<script src="jquery.min.js"></script>
 	<script>
 function add_test( name, desc, sourcecode, zcode, glulx )
@@ -30,12 +30,12 @@ function add_test( name, desc, sourcecode, zcode, glulx )
 		);
 }
 $(function(){
-	add_test( 'Czech', 'General Z-Machine unit test by Evin Robertson and Amir Karger', 'http://github.com/curiousdannii/if/raw/master/tests/czech.inf', 'http://curiousdannii.github.com/if/tests/czech.z5' );
-	add_test( 'Glulxercise', 'General Glulx unit test by Zarf', 0, 0, 0 );
-	add_test( '@parchment', 'Tests the experimental <a href="op-parchment.html">@parchment opcode</a> by Dannii', 'http://github.com/curiousdannii/if/raw/master/tests/op-parchment.inf', 'http://curiousdannii.github.com/if/tests/op-parchment.z5' );
-	add_test( 'Praxix', 'General Z-Machine unit test by Zarf and Dannii', 'http://github.com/curiousdannii/if/raw/master/tests/praxix.inf', 'http://curiousdannii.github.com/if/tests/praxix.z5' );
+	add_test( 'Czech', 'General Z-Machine unit test by Evin Robertson and Amir Karger', 'http://github.com/curiousdannii/if/raw/gh-pages/tests/czech.inf', 'http://curiousdannii.github.com/if/tests/czech.z5' );
+	//add_test( 'Glulxercise', 'General Glulx unit test by Zarf', 0, 0, 0 );
+	//add_test( '@parchment', 'Tests the experimental <a href="op-parchment.html">@parchment opcode</a> by Dannii', 'http://github.com/curiousdannii/if/raw/gh-pages/tests/op-parchment.inf', 'http://curiousdannii.github.com/if/tests/op-parchment.z5' );
+	add_test( 'Praxix', 'General Z-Machine unit test by Zarf and Dannii', 'http://github.com/curiousdannii/if/raw/gh-pages/tests/praxix.inf', 'http://curiousdannii.github.com/if/tests/praxix.z5' );
 	add_test( 'TerpEtude', 'Z-Machine unit test by Zarf with a focus on IO', 0, 'http://curiousdannii.github.com/if/tests/etude.z5' );
-	add_test( 'Unicode', 'Z-Machine Unicode tests by David Kinder', 'http://github.com/curiousdannii/if/raw/master/tests/unicode.inf', 'http://curiousdannii.github.com/if/tests/unicode.z5' );
+	add_test( 'Unicode', 'Z-Machine Unicode tests by David Kinder', 'http://github.com/curiousdannii/if/raw/gh-pages/tests/unicode.inf', 'http://curiousdannii.github.com/if/tests/unicode.z5' );
 });
 	</script>
 </head>
