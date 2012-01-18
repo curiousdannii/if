@@ -1,4 +1,4 @@
-Version 1/120117 of Benchmarking (for Glulx only) by Dannii Willis begins here.
+Version 1/120118 of Benchmarking (for Glulx only) by Dannii Willis begins here.
 
 "A general purpose benchmarking test framework that returns statistically significant results."
 
@@ -250,6 +250,8 @@ A test case has a number called the iteration multiplier. The iteration multipli
 A test case has a real number called the mean time.
 A test case has a real number called the relative error.
 
+The list of sorted test cases is a list of test cases variable.
+
 Section - Low level timing functions
 
 [ We need to know the minimum timer resolution so that our results will be meaningful. Not all terps can provide a full microsecond timer, and even those that do might might cache its value. ]
@@ -303,26 +305,6 @@ Include (-
 ];
 -).
 
-[ Determine how many times a test case can run in a period of time. Used when initialising test cases. ]
-To decide which number is how many times (func - phrase nothing -> nothing) can run in (target time - a number) microseconds/--:
-	(- run_function_for_time({func}-->1, {target time}) -).
-Include (-
-[ run_function_for_time func target count;
-	! Add the current time to the reqested target time
-	@copy current_time sp;
-	@glk 352 1 0;
-	target = target + (current_time-->1 & $FF) * 1000000 + current_time-->2;
-	while (target > ((current_time-->1 & $FF) * 1000000 + current_time-->2))
-	{
-		func();
-		@copy current_time sp;
-		@glk 352 1 0;
-		count++;
-	}
-	return count;
-];
--).
-
 Section - Activities and rulebooks
 
 [ We create several new activities, so that the framework can be decoupled from the interface. ]
@@ -335,19 +317,23 @@ Timing something is an activity on test cases.
 [ Go through all the test cases running them in turn. ]
 Rule for running the benchmark framework (this is the main running the benchmark framework rule):
 	let count be a number;
-	repeat with a test case running through test cases:
+	repeat with a test case running through the list of sorted test cases:
 		follow the initialising rules for the test case;
 		carry out the benchmarking activity with the test case;
 
 [ Initialise a test case by running it once and calculating the iteration multiplier. This initial running won't be counted for the statistics, because an interpreter might need to spend extra time JITing. ]
 A last initialising rule for a test case (called test case) (this is the initialising a test case rule):
+	let count be 1;
 	unless the test case is initialised or the test case is disabled:
 		now the test case is initialised;
-		[ Run the test case once in order to check it takes longer than the minimum timer resolution. Compare with 110% of the minimum timer resolution in case a cached timer was increased by slightly more than the resolution. ]
-		time the test case running it 1 times;
-		unless the elapsed time of the test case > (the minimum timer resolution * 110) / 100:
-			[ If the test is too quick, then run it for twice that resolution, so that we are definitely timing at least one whole resolution period. From now on we will be treating this test case as if using the iteration multiplier consistutes running the test case just once. ]
-			now the iteration multiplier of the test case is how many times the run phrase of the test case can run in (the minimum timer resolution * 2);
+		[ Run the test case once in order to check it takes longer than the minimum timer resolution. Compare with three times the minimum timer resolution to ensure that we are definitely timing at least two whole resolution periods. Running for twice didn't seem enough to stop the test case from timing 0. ]
+		time the test case running it count times;
+		while the elapsed time of the test case < the minimum timer resolution * 3:
+			[ If we're too quick, then keep doubling count until we reach the resolution. ]
+			now count is count * 2;
+			time the test case running it count times;
+		[ From now on we will be treating this test case as if using the iteration multiplier consistutes running the test case just once, though we'll use the multiplier right at the end when we calculate the stats. ]
+		now the iteration multiplier of the test case is count;
 
 [ Benchmark a test case by timing at least 5 samples. ]
 Rule for benchmarking a test case (called test case) (this is the benchmarking a test case rule):
@@ -362,7 +348,8 @@ Rule for benchmarking a test case (called test case) (this is the benchmarking a
 	if the test case is disabled:
 		stop;
 	now the total time of the test case is 0;
-	while sample size < 5 or the total time of the test case < 5000000:
+	[ Get 5 samples, and then keep going until we have 100 samples or we've been timing for 5 seconds. ]
+	while sample size < 5 or (the total time of the test case < 5000000 and sample size < 100):
 		increment sample size;
 		carry out the timing activity with the test case;
 		now period is
@@ -390,15 +377,19 @@ Rule for timing a test case (called test case) (this is the running a test case 
 	now the iteration count of the test case is 0;
 	while remaining time > 0:
 		time the test case running it count times;
+		[ Check for 0 times. The iteration multiplier should stop these from occuring, but just in case... ]
+		if the elapsed time of the test case < 1:
+			say "Error: Test time was 0!";
+			next;
 		increase the iteration time of the test case by the elapsed time of the test case;
 		increase the total time of the test case by the elapsed time of the test case;
 		increase the iteration count of the test case by count;
 		now remaining time is the minimum sample time - the iteration time of the test case;
 		[ Unless we have a positive remaining time the following calculations will be ignored. ]
-		[ Estimate how long it will take to reach the minimum sample time. The +1 is to stop annoying divide by 0 errors that should have been prevented by the iteration multiplier. ]
+		[ Estimate how long it will take to reach the minimum sample time. ]
 		now count is
 			(remaining time as a real number divided by (
-				(the elapsed time of the test case + 1) as a real number 
+				the elapsed time of the test case as a real number 
 				divided by count as a real number)
 			) rounded up
 			as a number;
@@ -408,8 +399,8 @@ Rule for timing a test case (called test case) (this is the running a test case 
 	[ Update the predicted sample count. ]
 	now the predicted sample count of the test case is
 		(the iteration count of the test case as a real number 
-		divided by the iteration time of the test case 
-		times the minimum sample time as a real number) 
+		times the minimum sample time as a real number
+		divided by the iteration time of the test case) 
 		rounded up 
 		as a number;
 
@@ -435,13 +426,21 @@ To pause briefly:
 	update the status line;
 	wait 1 ms before continuing;
 
+To say microseconds:
+	say "[unicode 181]s".
+
+To say command:
+	say "[bold type][bracket]".
+To say end command:
+	say "[close bracket][roman type]".
+
 Section - Rules to show the benchmark framework's progress
 
 Before running the benchmark framework (this is the resetting the interface rule):
 	now the left hand status line is "[The current test case]";
 	now the right hand status line is "[The current phase]";
 	clear the screen;
-	say "Test results[line break]";
+	say "[line break][bold type]Test results[roman type][line break]Timer resolution: [the minimum timer resolution][microseconds][line break]Minimum sample time: [the minimum sample time][microseconds][paragraph break]";
 
 A first initialising rule (this is the set the phase to initialising rule):
 	now the current phase is "Initialising".
@@ -462,34 +461,54 @@ After benchmarking a test case (called test case) (this is the say a test case's
 	if the test case is disabled:
 		say "[italic type](Disabled)";
 	otherwise:
-		say "[mean time of the test case][unicode 181]s [unicode 177][relative error of the test case]% ([current sample number] samples)";
+		say "[mean time of the test case][microseconds] [unicode 177][relative error of the test case]% ([current sample number] samples)";
 	say "[line break]";
 
 After running the benchmark framework (this is the show the total running time rule):
 	let total time be a number;
-	repeat with a test case running through test cases:
+	repeat with a test case running through the list of sorted test cases:
 		unless test case is disabled:
 			increase total time by the total time of the test case;
-	say "[line break]Total running time: [total time][unicode 181]s";
+	say "[line break]Total running time: [total time][microseconds]";
 	now the left hand status line is "";
 	now the right hand status line is "";
 	pause briefly;
 
 Section - The new order of play
 
-[ It all begins! ]
+[ Our new control sequence. ]
 To run the benchmark framework:
 	unless the interpreter can run the benchmark framework:
 		say "A modern interpreter which supports Glulx version 3.1.2 and Glk version 0.7.2 is required.";
-		stop the game abruptly;
+		stop;
 	if the minimum timer resolution is 0:
 		calculate the minimum timer resolution;
-	carry out the running the benchmark framework activity;
-	stop the game abruptly;
+	repeat with a test case running through test cases:
+		add the test case to the list of sorted test cases;
+	say the banner text;
+	run the control loop;
+
+[ Accept commands. ]
+To run the control loop:
+	let key be a number;
+	while 1 is 1:
+		say "[paragraph break]You can:[line break][command]Enter[end command] Run the benchmark[line break][command]T[end command] Start a transcript[line break][command]X[end command] Exit";
+		while 1 is 1:
+			now key is the chosen letter;
+			if key is -6:
+				carry out the running the benchmark framework activity;
+			otherwise if key is 84 or key is 116:
+				try switching the story transcript on;
+			otherwise if key is 88 or key is 120:
+				stop;
+			otherwise:
+				next;
+			break;
 
 [ We don't want to follow the regular turn sequence, so highjack the game when play begins. Unlist this if you want to control when it runs yourself. ]
-Rule for when play begins (this is the benchmark framework is taking over rule):
+A last when play begins rule (this is the benchmark framework is taking over rule):
 	run the benchmark framework;
+	stop the game abruptly;
 
 Benchmarking ends here.
 
@@ -520,6 +539,8 @@ Some test cases might require recent or optional interpreter features. If so the
 			now my test case is disabled.
 
 Benchmarking is currently only designed for testing Glulx functionality, and it may not work well for testing Glk functionality. If you have potential Glk test cases please contact the author.
+
+Unfortunately Inform 7's built in interpreter is not modern enough to run this (on Windows at least). Please use the output.ulx file from the Build folder in another interpreter.
 
 Example: * Text matching - Avoiding slow Regular Expressions.
 
