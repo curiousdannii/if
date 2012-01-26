@@ -12,7 +12,7 @@
 <h1>The Z-Machine Standard 1.2 (draft)</h1>
 <p>Dannii Willis &lt;<a href="mailto:curiousdannii@gmail.com">curiousdannii@gmail.com</a>&gt;
 <p>Permalink: <a href="http://curiousdannii.github.com/if/zspec12.html">http://curiousdannii.github.com/if/zspec12.html</a>
-<p>Status: draft as of 2 October 2011.</p>
+<p>Status: draft as of 27 January 2012.</p>
 
 <h2 id="introduction">1. Introduction</h2>
 <h3 id="rationale">1.1 Rationale</h3>
@@ -46,13 +46,15 @@
 <p>The following is an official list of selectors and their associated opcodes. Extensions will generally be specified elsewhere (and only a short description given below) although a few from existing interpreters have also been documented. If you would like to reserve a selector or opcode for your own extensions, please contact <a href="mailto:curiousdannii@gmail.com">the author</a>.
 
 <table>
-	<tr><th>Extension title</th><th>Selector ID</th><th>Associated opcodes</th><th>Description</th></tr>
+	<tr><th>Extension title</th><th>Selector ID</th><th>Associated opcodes, streams</th><th>Description</th></tr>
 	
 	<tr><td>Standard version</td><td><code>$01</code></td><td>-</td><td><b>Core</b>: stores the Z-Machine standard which this interpreter supports. Will be <code>$0102</code> or higher.</td></tr>
 
 	<tr><td>Transcripts Protocol</td><td><code>$10</code></td><td>-</td><td>Specifies whether the interpreter supports tagged responses. <a href="#transcripts">[Transcripts]</a></td></tr>
 	
 	<tr><td>@parchment</td><td><code>$20</code></td><td><code>EXT:31</code></td><td>Support for <code>@parchment</code>. <a href="#op-parchment">[@Parchment]</a></td></tr>
+
+	<tr><td>eval() stream</td><td><code>$30</code></td><td><code>Stream:5</code></td><td>Supports the eval() stream. It behaves identically to the memory stream, except that when it is turned off its contents will be run through the Javascript function eval(), and what that returns will be written back to memory. If they are both enabled then the memory stream takes priority.</td></tr>
 	
 	<tr><td>Zoom profiling</td><td><code>$1000</code></td><td><code>EXT:128-131</code></td><td>Provides opcodes for accessing the system timer. For more details see Zoom's README <a href="#zoom">[Zoom]</a>.</td></tr>
 	

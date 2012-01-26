@@ -1,0 +1,96 @@
+! eval() stream examples and unit tests
+! Currently only for Z-Machine
+! by Dannii
+
+Constant HDR_SPECREVISION  $32;
+
+Global gg_mainwin = 0;
+Array gg_event --> 4;
+
+Array streambuf buffer 200;
+
+[ Main val done;
+
+	#Ifdef TARGET_GLULX;
+		@setiosys 2 0; ! select Glk I/O system
+
+		! Open a text-buffer window, and select it as the current output stream.
+		gg_mainwin = glk($0023, 0, 0, 0, 3, 0); ! glk_window_open
+		glk($002F, gg_mainwin); ! glk_set_window
+	#Endif; ! TARGET_GLULX
+
+	print "eval() stream tests^^";
+	
+	Test();
+	
+	#Ifdef TARGET_ZCODE;
+		@read_char 1 -> val;
+	#Ifnot; ! TARGET_GLULX
+		done = false;
+		glk($00D2, gg_mainwin); ! request_char_event
+		while (~~done) {
+			glk($00C0, gg_event); ! select
+			switch (gg_event-->0) {
+				2: ! evtype_CharInput
+					if (gg_event-->1 == gg_mainwin)
+						done = true;
+			}
+		}
+	#Endif; ! TARGET_
+
+];
+
+[ Version;
+	! Print the version number
+	print HDR_SPECREVISION->0, ".", HDR_SPECREVISION->1;
+];
+
+[ Gestalt zid gid arg val;
+
+	! Check a gestalt value
+	#Ifdef TARGET_ZCODE;
+		@"EXT:30S" zid arg -> val;
+	#Ifnot; ! TARGET_GLULX
+		@gestalt gid arg val;
+	#Endif; ! TARGET_
+	
+	return val;
+];
+
+[ PrintBuffer addr i len;
+	len = addr-->0;
+	addr = addr + 2;
+	for (i=0: i < len: i++) print (char) addr->i;
+];
+
+[ Test val ;
+	
+	#Ifdef TARGET_ZCODE;
+		! Check we're in a 1.2 version interpreter
+		val = HDR_SPECREVISION-->0;
+		if (val < $0102)
+		{
+			print "Stopping, interpreter is only version "; Version(); print ".^";
+			return;
+		}
+	
+		print "Ok, interpreter is version "; Version(); print ".^^";
+	#Endif; ! TARGET_ZCODE
+
+	! Checking for eval() stream support
+	if ( Gestalt($30, 0, 0) == 0 )
+	{
+		print "Stopping, no support for the eval() stream.^";
+		return;
+	}
+	
+	@output_stream 5 streambuf;
+	
+	print "alert(~The eval() stream is supported.~);";
+	
+	print "navigator.userAgent";
+	
+	@output_stream (-5);
+
+	print "Your userAgent: "; PrintBuffer(streambuf);
+];
