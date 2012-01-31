@@ -1,14 +1,13 @@
-Version 1/120118 of Benchmarking (for Glulx only) by Dannii Willis begins here.
+Version 1/120208 of Benchmarking (for Glulx only) by Dannii Willis begins here.
 
-"A general purpose benchmarking test framework that returns statistically significant results."
+"A general purpose benchmarking test framework that produces statistically significant results."
 
 "based on benchmark.js http://benchmarkjs.com"
 
 Include Basic Screen Effects by Emily Short.
-[Include Glulx Text Effects by Emily Short.]
+Include Glulx Text Effects by Emily Short.
 Include Real-Time Delays by Erik Temple.
-
-[ Are there better ways to get totals from lists? ]
+Include Flexible Windows by Jon Ingold.
 
 Part 1 - The framework
 
@@ -80,6 +79,20 @@ Include (-
 [ pow a b c;
 	@pow a b c;
 	return c;
+];
+
+[ fabs a;
+	@jflt a 0 ?negval;
+	return a;
+	.negval;
+	return fsub(0, a);
+];
+
+[ jfgt a b;
+	@jfgt a b ?isgreater;
+	return 0;
+	.isgreater;
+	return 1;
 ];
 
 Array PowersOfTen --> 1 10 100 1000 10000 100000 1000000 10000000 100000000 1000000000;
@@ -188,7 +201,7 @@ Array PowersOfTen --> 1 10 100 1000 10000 100000 1000000 10000000 100000000 1000
 -).
 
 A real number is a kind of value. R1 specifies a real number.
-The specification of a real number is "Real numbers used for benchmark statistics. Is only minimal implemented and is not suitable for reuse."
+The specification of a real number is "Real numbers used for benchmark statistics. Is only minimally implemented and is not suitable for reuse."
 
 To decide which real number is (a - number) as a real number:
 	(- numtof({a}) -).
@@ -219,6 +232,12 @@ To decide which real number is the square root of (a - real number):
 To decide which real number is (a - real number) to the power of (b - real number):
 	(- pow({a}, {b}) -).
 
+To decide which real number is the absolute value of (a - real number):
+	(- fabs({a}) -).
+
+To decide whether (a - real number) is more than (b - real number):
+	(- jfgt({a}, {b}) -).
+
 To say (a - real number):
 	(- FloatDec({a}, 2); -).
 
@@ -246,11 +265,12 @@ A test case has a number called the iteration time.
 A test case has a number called the total time.
 A test case has a number called the predicted sample count. The predicted sample count is usually 1.
 A test case has a number called the iteration count.
+A test case has a number called the total count.
 A test case has a number called the iteration multiplier. The iteration multiplier is usually 1.
+A test case has a number called the sample size.
 A test case has a real number called the mean time.
+A test case has a real number called the variance.
 A test case has a real number called the relative error.
-
-The list of sorted test cases is a list of test cases variable.
 
 Section - Low level timing functions
 
@@ -305,6 +325,73 @@ Include (-
 ];
 -).
 
+Section - Statistics
+
+[ We must customise LIST_OF_TY_Sort in order to compare real number properties. ]
+To sort (L - a list of objects) in (P - real number valued property) order:
+	(- LIST_OF_TY_Sort_Real_Number_Prop({-pointer-to:L}, 1, {P}, {-block-value:P}); -).
+To sort (L - a list of objects) in reverse (P - real number valued property) order:
+	(- LIST_OF_TY_Sort_Real_Number_Prop({-pointer-to:L}, -1, {P}, {-block-value:P}); -).
+Include (-
+Global LIST_OF_TY_Sort_cf;
+[ LIST_OF_TY_Sort_Real_Number_Prop list dir prop cf  i j no_items v;
+	no_items = BlkValueRead(list, LIST_LENGTH_F);
+	if (dir == 2) {
+		if (no_items < 2) return;
+		for (i=1:i<no_items:i++) {
+			j = random(i+1) - 1;
+			v = BlkValueRead(list, LIST_ITEM_BASE+i);
+			BlkValueWrite(list, LIST_ITEM_BASE+i, BlkValueRead(list, LIST_ITEM_BASE+j));
+			BlkValueWrite(list, LIST_ITEM_BASE+j, v);
+		}
+		return;
+	}
+	SetSortDomain(ListSwapEntries, ListCompareEntries);
+	!if (cf) { LIST_OF_TY_Sort_cf = BlkValueCompare; ! dir = -dir;
+	!}
+	!else LIST_OF_TY_Sort_cf = 0;
+	LIST_OF_TY_Sort_cf = fsub;
+	SortArray(list, prop, dir, no_items, false, 0);
+];
+-).
+
+[ T-test! ]
+To decide which real number is the t value for (a - test case) and (b - test case):
+	let pooled be
+		( ((the sample size of a - 1) as a real number times the variance of a) plus ((the sample size of b - 1) as a real number times the variance of b) )
+		divided by (the sample size of a + the sample size of b - 2) as a real number;
+	decide on
+		(mean time of a minus mean time of b)
+		divided by the square root of ((pooled divided by the sample size of a as a real number) plus (pooled divided by the sample size of b as a real number));
+
+[ Critical values ]
+To decide which real number is the critical value for (df - number):
+	(- get_critical_value({df}) -).
+Include (-
+! Taken from http://www.itl.nist.gov/div898/handbook/eda/section3/eda3672.htm
+Array critical_values_table -->
+	$+12.706 $+4.303 $+3.182 $+2.776 $+2.571 $+2.447 $+2.365 $+2.306 $+2.262 $+2.228
+	$+2.201 $+2.179 $+2.16 $+2.145 $+2.131 $+2.12 $+2.11 $+2.101 $+2.093 $+2.086
+	$+2.08 $+2.074 $+2.069 $+2.064 $+2.06 $+2.056 $+2.052 $+2.048 $+2.045 $+2.042;
+Constant critical_value_infinity = $+1.96;
+
+[ get_critical_value df;
+	if (df > 30)
+	{
+		return critical_value_infinity;
+	}
+	return critical_values_table-->(df - 1);
+];
+-);
+
+[ Significance ]
+To decide whether (a - test case) and (b - test case) are statistically indistinguishable:
+	[say "[fixed letter spacing]  [variable letter spacing]Variance:[the variance of a][line break]";
+	say "[fixed letter spacing]  [variable letter spacing]T value:[the t value for a and b][line break]";]
+	if the absolute value of (the t value for a and b) is more than the critical value for (the sample size of a + the sample size of b - 2):
+		decide no;
+	decide yes;
+
 Section - Activities and rulebooks
 
 [ We create several new activities, so that the framework can be decoupled from the interface. ]
@@ -317,7 +404,7 @@ Timing something is an activity on test cases.
 [ Go through all the test cases running them in turn. ]
 Rule for running the benchmark framework (this is the main running the benchmark framework rule):
 	let count be a number;
-	repeat with a test case running through the list of sorted test cases:
+	repeat with a test case running through the list of test cases:
 		follow the initialising rules for the test case;
 		carry out the benchmarking activity with the test case;
 
@@ -326,7 +413,7 @@ A last initialising rule for a test case (called test case) (this is the initial
 	let count be 1;
 	unless the test case is initialised or the test case is disabled:
 		now the test case is initialised;
-		[ Run the test case once in order to check it takes longer than the minimum timer resolution. Compare with three times the minimum timer resolution to ensure that we are definitely timing at least two whole resolution periods. Running for twice didn't seem enough to stop the test case from timing 0. ]
+		[ Run the test case once in order to check it takes longer than the minimum timer resolution. Compare with three times the minimum timer resolution to ensure that we are definitely timing at least two whole resolution periods. Running only twice didn't seem enough to stop the test case from timing 0. ]
 		time the test case running it count times;
 		while the elapsed time of the test case < the minimum timer resolution * 3:
 			[ If we're too quick, then keep doubling count until we reach the resolution. ]
@@ -344,10 +431,12 @@ Rule for benchmarking a test case (called test case) (this is the benchmarking a
 	let variance be a real number;
 	let standard deviation be a real number;
 	let standard mean error be a real number;
+	let error margin be a real number;
 	let relative error be a real number;
 	if the test case is disabled:
 		stop;
 	now the total time of the test case is 0;
+	now the total count of the test case is 0;
 	[ Get 5 samples, and then keep going until we have 100 samples or we've been timing for 5 seconds. ]
 	while sample size < 5 or (the total time of the test case < 5000000 and sample size < 100):
 		increment sample size;
@@ -363,10 +452,13 @@ Rule for benchmarking a test case (called test case) (this is the benchmarking a
 	now variance is variance divided by (sample size - 1 as a real number);
 	now standard deviation is the square root of variance;
 	now standard mean error is standard deviation divided by the square root of sample size as a real number;
-	now relative error is (standard mean error divided by mean) times 100 as a real number;
+	now error margin is standard mean error times the critical value for (sample size - 1);
+	now relative error is (error margin divided by mean) times 100 as a real number;
 	[ Update the test case with these stats. ]
 	now the mean time of the test case is mean;
+	now the variance of the test case is variance;
 	now the relative error of the test case is relative error;
+	now the sample size of the test case is sample size;
 
 [ Time a test case, by running it for at least the minimum sample time. ]
 Rule for timing a test case (called test case) (this is the running a test case once rule):
@@ -384,6 +476,7 @@ Rule for timing a test case (called test case) (this is the running a test case 
 		increase the iteration time of the test case by the elapsed time of the test case;
 		increase the total time of the test case by the elapsed time of the test case;
 		increase the iteration count of the test case by count;
+		increase the total count of the test case by count;
 		now remaining time is the minimum sample time - the iteration time of the test case;
 		[ Unless we have a positive remaining time the following calculations will be ignored. ]
 		[ Estimate how long it will take to reach the minimum sample time. ]
@@ -410,10 +503,9 @@ Part 2 - The interface unindexed
 There is a room.
 
 [ Extra styles for the results table. ]
-[Table of User Styles (continued)
+Table of User Styles (continued)
 style name	justification	obliquity	indentation	first-line indentation	boldness	fixed width	relative size	glulx color 
-special-style-1	left-justified	no-obliquity	0	0	bold-weight	fixed-width-font	0	g-black 
-special-style-2	left-justified	italic-obliquity	0	0	regular-weight	fixed-width-font	0	g-black ]
+bold-style	--	--	--	--	--	--	--	g-green
 
 [ Status line variables. ]
 The current test case is a test case that varies.
@@ -429,27 +521,40 @@ To pause briefly:
 To say microseconds:
 	say "[unicode 181]s".
 
+To say header type -- running on:
+	(- VM_Style(HEADER_VMSTY); -).
+
 To say command:
 	say "[bold type][bracket]".
 To say end command:
 	say "[close bracket][roman type]".
+
+To say (test case - a test case) results:
+	say "[fixed letter spacing]  [variable letter spacing][mean time of the test case][microseconds] [unicode 177][relative error of the test case]%[line break]";
+	say "[fixed letter spacing]  [variable letter spacing]([sample size of the test case] samples, [total count of the test case * iteration multiplier of the test case] total runs)";
+
+[ The stats will show up in a side window. ]
+The stats window is a g-window.
+The main-window spawns the stats window. The position of the stats window is g-placeright.
+The scale method of the stats window is g-proportional. The measurement of the stats window is 50.
 
 Section - Rules to show the benchmark framework's progress
 
 Before running the benchmark framework (this is the resetting the interface rule):
 	now the left hand status line is "[The current test case]";
 	now the right hand status line is "[The current phase]";
-	clear the screen;
-	say "[line break][bold type]Test results[roman type][line break]Timer resolution: [the minimum timer resolution][microseconds][line break]Minimum sample time: [the minimum sample time][microseconds][paragraph break]";
+	move focus to stats window, clearing the window;
+	say "[line break][header type]Test results[roman type][line break]Timer resolution: [the minimum timer resolution][microseconds][paragraph break]";
 
 A first initialising rule (this is the set the phase to initialising rule):
 	now the current phase is "Initialising".
 
 Before benchmarking a test case (called test case) (this is the showing a test case's info rule):
+	move focus to stats window;
 	now the current test case is the test case;
 	now the current phase is "";
 	now the current sample number is 0;
-	say "[The test case]:";
+	say "[The test case]:[run paragraph on]";
 	pause briefly;
 
 Before timing a test case (this is the update the phase rule):
@@ -458,21 +563,36 @@ Before timing a test case (this is the update the phase rule):
 	pause briefly;
 
 After benchmarking a test case (called test case) (this is the say a test case's benchmark results rule):
+	move focus to stats window;
+	say "[line break]";
 	if the test case is disabled:
-		say "[italic type](Disabled)";
+		say "  [italic type](Disabled)";
 	otherwise:
-		say "[mean time of the test case][microseconds] [unicode 177][relative error of the test case]% ([current sample number] samples)";
+		say the test case results;
 	say "[line break]";
 
-After running the benchmark framework (this is the show the total running time rule):
+[ Update the stats window with the results. The test cases will be sorted by ascending mean times, and those that are statistically the fastest will be coloured green. ]
+After running the benchmark framework (this is the show the final results rule):
 	let total time be a number;
-	repeat with a test case running through the list of sorted test cases:
-		unless test case is disabled:
-			increase total time by the total time of the test case;
-	say "[line break]Total running time: [total time][microseconds]";
+	let sorted test cases be the list of test cases;
 	now the left hand status line is "";
 	now the right hand status line is "";
-	pause briefly;
+	update the status line;
+	sort sorted test cases in mean time order;
+	move focus to stats window, clearing the window;
+	say "[line break][header type]Test results[roman type][line break]Timer resolution: [the minimum timer resolution][microseconds][paragraph break]";
+	repeat with a test case running through sorted test cases:
+		unless test case is disabled:
+			increase total time by the total time of the test case;
+			if the test case and entry 1 of sorted test cases are statistically indistinguishable:
+				say "[bold type][The test case]:[roman type][line break]";
+			otherwise:
+				say "[The test case]:[line break]";
+			say the test case results;
+			say "[line break]";
+	let real total time be total time as a real number divided by 1000000 as a real number;
+	say "[line break]Total running time: [real total time]s[paragraph break]The fastest test case is bold and green. If more than one test case is green then they are statistically indistinguishable.[run paragraph on]";
+	move focus to main-window;
 
 Section - The new order of play
 
@@ -483,8 +603,7 @@ To run the benchmark framework:
 		stop;
 	if the minimum timer resolution is 0:
 		calculate the minimum timer resolution;
-	repeat with a test case running through test cases:
-		add the test case to the list of sorted test cases;
+	open up stats window;
 	say the banner text;
 	run the control loop;
 
@@ -492,13 +611,16 @@ To run the benchmark framework:
 To run the control loop:
 	let key be a number;
 	while 1 is 1:
-		say "[paragraph break]You can:[line break][command]Enter[end command] Run the benchmark[line break][command]T[end command] Start a transcript[line break][command]X[end command] Exit";
+		say "[paragraph break]You can:[line break][command]Enter[end command] Run the benchmark[line break][command]T[end command] Start a transcript[line break][command]X[end command] Exit[run paragraph on]";
 		while 1 is 1:
 			now key is the chosen letter;
 			if key is -6:
 				carry out the running the benchmark framework activity;
+				next;
 			otherwise if key is 84 or key is 116:
+				say "[line break]";
 				try switching the story transcript on;
+				echo the stream of the stats window to the transcript;
 			otherwise if key is 88 or key is 120:
 				stop;
 			otherwise:
@@ -514,13 +636,13 @@ Benchmarking ends here.
 
 ---- DOCUMENTATION ---- 
 
-Benchmarking provides a general purpose benchmarking test framework which returns statistically significant results. Benchmarking refers to carefully timing how long some task takes to run. Benchmarking has two types of users in mind:
+Benchmarking provides a general purpose benchmarking test framework which produces statistically significant results. Benchmarking refers to carefully timing how long some task takes to run. This extension has two types of users in mind:
 
 1. Story and extension authors can use Benchmarking to compare alternatives for some slow programming task. The example below shows how you might use Benchmarking to compare alternative ways to match texts.
 
 2. Interpreter authors can use Benchmarking to compare their interpreter with others, as well as to compare interpreter updates to see whether they have a performance benefit or deficit.
 
-Benchmarking is based on the Javascript library Benchmark.js. http://benchmark.js.com
+Benchmarking is based on the Javascript library Benchmark.js. http://benchmarkjs.com
 
 A test case should be added for each task or algorithm you wish to test. Each test case must be provided with a run phrase, which is what will be benchmarked. Unfortunately the Inform 7 syntax for attaching the run phrase is a little clunky. You must first give the phrase a name, and then attach it to the test case.
 
@@ -528,6 +650,8 @@ A test case should be added for each task or algorithm you wish to test. Each te
 	To run my test case (this is running my test case):
 		...
 	The run phrase of my test case is running my test case.
+
+If you are comparing algorithms for the same task it is important that they all do actually do the same thing. This extension does not and cannot compare whether test case algorithms are equivalent, so you should first test your algorithms thoroughly. It is also important that test cases run the same each time through, so if your test case changes the world state in some way you must reset what it changes as part of your run phrase.
 
 Test cases are a kind of thing, so like all things they can have descriptions. They can also be given an author, as shown in the example.
 
@@ -540,7 +664,7 @@ Some test cases might require recent or optional interpreter features. If so the
 
 Benchmarking is currently only designed for testing Glulx functionality, and it may not work well for testing Glk functionality. If you have potential Glk test cases please contact the author.
 
-Unfortunately Inform 7's built in interpreter is not modern enough to run this (on Windows at least). Please use the output.ulx file from the Build folder in another interpreter.
+Unfortunately Inform 7's built in interpreter may not be modern enough to run this (this is the case at least for Windows prior to the 2012 re-release of 6G60). Please use the output.ulx file from the Build folder in another interpreter.
 
 Example: * Text matching - Avoiding slow Regular Expressions.
 
@@ -563,30 +687,7 @@ Example: * Text matching - Avoiding slow Regular Expressions.
 	[ Now check the texts directly, without using regular expressions.]
 	To decide if (txb - indexed text) matches the text (ftxb - indexed text) without regex:
 		(- check_for_matches({-pointer-to:txb}, {-pointer-to:ftxb}) -).
-	Include (-
-	[ check_for_matches text search
-		textsize searchsize i j k;
-		textsize = BlkValueExtent(text);
-		searchsize = BlkValueExtent(search);
-		for (i=0 : i<textsize - searchsize + 1 : i++)
-		{
-			k = 0;
-			for (j=0 : j < searchsize: j++)
-			{
-				if (BlkValueRead(text, i+j) ~= BlkValueRead(search, j))
-				{
-					k = 1;
-					break;
-				}
-			}
-			if (k == 0)
-			{
-				return 1;
-			}
-		}
-		return 0;
-	];
-	-).
+	Include (- [ check_for_matches text search   textsize searchsize i j k; textsize = BlkValueExtent(text); searchsize = BlkValueExtent(search); for (i=0 : i<textsize - searchsize + 1 : i++) { k = 0; for (j=0 : j < searchsize: j++) { if (BlkValueRead(text, i+j) ~= BlkValueRead(search, j)) { k = 1; break; } } if (k == 0) { return 1; } } return 0; ]; -).
 
 	Direct comparison is a test case.
 	The author of Direct comparison is "Dannii Willis".
