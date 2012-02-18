@@ -1,4 +1,4 @@
-Version 1/120208 of Benchmarking (for Glulx only) by Dannii Willis begins here.
+Version 1/120218 of Benchmarking (for Glulx only) by Dannii Willis begins here.
 
 "A general purpose benchmarking test framework that produces statistically significant results."
 
@@ -699,7 +699,7 @@ Benchmarking is currently only designed for testing Glulx functionality, and it 
 
 Section: Change log
 
-Version 1/120208: Initial (non-beta) release
+Version 1/120218: Initial (non-beta) release
 
 Example: * Text matching - Avoiding slow Regular Expressions.
 
