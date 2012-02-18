@@ -268,7 +268,7 @@ A test case has a number called the iteration count.
 A test case has a number called the total count.
 A test case has a number called the iteration multiplier. The iteration multiplier is usually 1.
 A test case has a number called the sample size.
-A test case has a real number called the mean time.
+A test case has a real number called the mean time. The mean time is usually R2139095040. [ +Infinity, so that sorting test cases works as we want, with disabled test cases last. ]
 A test case has a real number called the variance.
 A test case has a real number called the relative error.
 
@@ -529,28 +529,47 @@ To say command:
 To say end command:
 	say "[close bracket][roman type]".
 
+To say indent:
+	say "[fixed letter spacing]  [variable letter spacing]";
+
 To say (test case - a test case) results:
-	say "[fixed letter spacing]  [variable letter spacing][mean time of the test case][microseconds] [unicode 177][relative error of the test case]%[line break]";
-	say "[fixed letter spacing]  [variable letter spacing]([sample size of the test case] samples, [total count of the test case * iteration multiplier of the test case] total runs)";
+	say "[indent][mean time of the test case][microseconds] [unicode 177][relative error of the test case]%[line break]";
+	say "[indent]([sample size of the test case] samples, [total count of the test case * iteration multiplier of the test case] total runs)";
 
 [ The stats will show up in a side window. ]
-The stats window is a g-window.
-The main-window spawns the stats window. The position of the stats window is g-placeright.
-The scale method of the stats window is g-proportional. The measurement of the stats window is 50.
+The menu window is a g-window.
+The main-window spawns the menu window. The position of the menu window is g-placeleft.
+The scale method of the menu window is g-proportional. The measurement of the menu window is 33.
+
+[ Show some information on each test case. ]
+To show the test case information:
+	clear the main-window;
+	repeat with a test case running through the list of test cases:
+		say "[bold type][The test case][roman type]";
+		if the author of the test case is not "":
+			say " by [the author of the test case]";
+		say "[line break]";
+		if the description of the test case is not "":
+			say the description of the test case;
+		otherwise:
+			say "[italic type](No description)[roman type]";
+		[ Silly hacks to make it print nicely. ]
+		if the test case is not entry (number of entries in the list of test cases) in the list of test cases:
+			say paragraph break;
+		say "[run paragraph on]";
 
 Section - Rules to show the benchmark framework's progress
 
 Before running the benchmark framework (this is the resetting the interface rule):
 	now the left hand status line is "[The current test case]";
 	now the right hand status line is "[The current phase]";
-	move focus to stats window, clearing the window;
+	clear the main-window;
 	say "[line break][header type]Test results[roman type][line break]Timer resolution: [the minimum timer resolution][microseconds][paragraph break]";
 
 A first initialising rule (this is the set the phase to initialising rule):
 	now the current phase is "Initialising".
 
 Before benchmarking a test case (called test case) (this is the showing a test case's info rule):
-	move focus to stats window;
 	now the current test case is the test case;
 	now the current phase is "";
 	now the current sample number is 0;
@@ -563,10 +582,9 @@ Before timing a test case (this is the update the phase rule):
 	pause briefly;
 
 After benchmarking a test case (called test case) (this is the say a test case's benchmark results rule):
-	move focus to stats window;
 	say "[line break]";
 	if the test case is disabled:
-		say "  [italic type](Disabled)";
+		say "[indent][italic type](Disabled)[roman type]";
 	otherwise:
 		say the test case results;
 	say "[line break]";
@@ -579,10 +597,12 @@ After running the benchmark framework (this is the show the final results rule):
 	now the right hand status line is "";
 	update the status line;
 	sort sorted test cases in mean time order;
-	move focus to stats window, clearing the window;
+	clear the main-window;
 	say "[line break][header type]Test results[roman type][line break]Timer resolution: [the minimum timer resolution][microseconds][paragraph break]";
 	repeat with a test case running through sorted test cases:
-		unless test case is disabled:
+		if test case is disabled:
+			say "[The test case]:[line break][indent][italic type](Disabled)[roman type][line break]";
+		otherwise:
 			increase total time by the total time of the test case;
 			if the test case and entry 1 of sorted test cases are statistically indistinguishable:
 				say "[bold type][The test case]:[roman type][line break]";
@@ -592,7 +612,6 @@ After running the benchmark framework (this is the show the final results rule):
 			say "[line break]";
 	let real total time be total time as a real number divided by 1000000 as a real number;
 	say "[line break]Total running time: [real total time]s[paragraph break]The fastest test case is bold and green. If more than one test case is green then they are statistically indistinguishable.[run paragraph on]";
-	move focus to main-window;
 
 Section - The new order of play
 
@@ -603,29 +622,33 @@ To run the benchmark framework:
 		stop;
 	if the minimum timer resolution is 0:
 		calculate the minimum timer resolution;
-	open up stats window;
-	say the banner text;
+	open up menu window;
 	run the control loop;
 
 [ Accept commands. ]
 To run the control loop:
 	let key be a number;
+	clear the menu window;
+	move focus to menu window;
+	say the banner text;
+	say "[paragraph break]You can:[line break][command]Enter[end command] Run the benchmark[line break][command]D[end command] Show test descriptions[line break][command]T[end command] Start a transcript[line break][command]X[end command] Exit[run paragraph on]";
+	move focus to main-window;
 	while 1 is 1:
-		say "[paragraph break]You can:[line break][command]Enter[end command] Run the benchmark[line break][command]T[end command] Start a transcript[line break][command]X[end command] Exit[run paragraph on]";
-		while 1 is 1:
-			now key is the chosen letter;
-			if key is -6:
-				carry out the running the benchmark framework activity;
-				next;
-			otherwise if key is 84 or key is 116:
-				say "[line break]";
-				try switching the story transcript on;
-				echo the stream of the stats window to the transcript;
-			otherwise if key is 88 or key is 120:
-				stop;
-			otherwise:
-				next;
-			break;
+		now key is the chosen letter;
+		[ Run on Enter or Space ]
+		if key is -6 or key is 32:
+			carry out the running the benchmark framework activity;
+		[ Test case info on D ]
+		if key is 68 or key is 100:
+			show the test case information;
+		[ Transcript on T ]
+		if key is 84 or key is 116:
+			say "[line break]";
+			clear the main-window;
+			try switching the story transcript on;
+		[ Exit on X or Escape ]
+		if key is -8 or key is 88 or key is 120:
+			stop;
 
 [ We don't want to follow the regular turn sequence, so highjack the game when play begins. Unlist this if you want to control when it runs yourself. ]
 A last when play begins rule (this is the benchmark framework is taking over rule):
