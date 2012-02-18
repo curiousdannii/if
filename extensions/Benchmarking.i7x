@@ -659,6 +659,8 @@ Benchmarking ends here.
 
 ---- DOCUMENTATION ---- 
 
+Section: Introduction
+
 Benchmarking provides a general purpose benchmarking test framework which produces statistically significant results. Benchmarking refers to carefully timing how long some task takes to run. This extension has two types of users in mind:
 
 1. Story and extension authors can use Benchmarking to compare alternatives for some slow programming task. The example below shows how you might use Benchmarking to compare alternative ways to match texts.
@@ -666,6 +668,14 @@ Benchmarking provides a general purpose benchmarking test framework which produc
 2. Interpreter authors can use Benchmarking to compare their interpreter with others, as well as to compare interpreter updates to see whether they have a performance benefit or deficit.
 
 Benchmarking is based on the Javascript library Benchmark.js. http://benchmarkjs.com
+
+Benchmarking depends on Real-Time Delays by Erik Temple and Flexible Windows by Jon Ingold.
+
+Unfortunately Inform 7's built in interpreter may not be modern enough to run this (this is the case at least for Windows prior to the 2012 re-release of 6G60). Please use the output.ulx file from the Build folder in another interpreter.
+
+The latest version of this extension can always be found at http://curiousdannii.github.com/if/. To contact the author please email curiousdannii@gmail.com.
+
+Section: Writing test cases
 
 A test case should be added for each task or algorithm you wish to test. Each test case must be provided with a run phrase, which is what will be benchmarked. Unfortunately the Inform 7 syntax for attaching the run phrase is a little clunky. You must first give the phrase a name, and then attach it to the test case.
 
@@ -687,7 +697,9 @@ Some test cases might require recent or optional interpreter features. If so the
 
 Benchmarking is currently only designed for testing Glulx functionality, and it may not work well for testing Glk functionality. If you have potential Glk test cases please contact the author.
 
-Unfortunately Inform 7's built in interpreter may not be modern enough to run this (this is the case at least for Windows prior to the 2012 re-release of 6G60). Please use the output.ulx file from the Build folder in another interpreter.
+Section: Change log
+
+Version 1/120208: Initial (non-beta) release
 
 Example: * Text matching - Avoiding slow Regular Expressions.
 
