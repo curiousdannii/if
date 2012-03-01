@@ -12,7 +12,7 @@
 <h1>The Z-Machine Standard 1.2 (draft)</h1>
 <p>Dannii Willis &lt;<a href="mailto:curiousdannii@gmail.com">curiousdannii@gmail.com</a>&gt;
 <p>Permalink: <a href="http://curiousdannii.github.com/if/zspec12.html">http://curiousdannii.github.com/if/zspec12.html</a>
-<p>Status: draft as of 27 January 2012.</p>
+<p>Status: draft as of 1 March 2012.</p>
 
 <h2 id="introduction">1. Introduction</h2>
 <h3 id="rationale">1.1 Rationale</h3>
@@ -54,7 +54,9 @@
 	
 	<tr><td>@parchment</td><td><code>$20</code></td><td><code>EXT:31</code></td><td>Support for <code>@parchment</code>. <a href="#op-parchment">[@Parchment]</a></td></tr>
 
-	<tr><td>eval() stream</td><td><code>$30</code></td><td><code>Stream:5</code></td><td>Supports the eval() stream. It behaves identically to the memory stream, except that when it is turned off its contents will be run through the Javascript function eval(), and what that returns will be written back to memory. If they are both enabled then the memory stream takes priority.</td></tr>
+	<tr><td>eval() stream</td><td><code>$30</code></td><td><code>Stream:5</code></td><td>Supports the eval() stream. It behaves like the memory stream, except that when it is turned off its contents will be run through the Javascript function eval(), and what that returns will be written back to memory. If they are both enabled then the memory stream takes priority.</td></tr>
+
+	<tr><td>Vorple</td><td><code>$31</code></td><td><code>Stream:6</code></td><td>A stream reserved for Vorple. <a href="#vorple">[Vorple]</a></td></tr>
 	
 	<tr><td>Zoom profiling</td><td><code>$1000</code></td><td><code>EXT:128-131</code></td><td>Provides opcodes for accessing the system timer. For more details see Zoom's README <a href="#zoom">[Zoom]</a>.</td></tr>
 	
@@ -82,6 +84,8 @@
 	<li id="spec11"><a>[Spec11]</a> <cite><a href="http://ifarchive.org/if-archive/infocom/interpreters/specification/ZSpec11.txt">Z-Machine Standard 1.1 Document.</a></cite> 2006. Kevin Bracey, Jason C. Penney, David Kinder.</li>
 
 	<li id="transcripts"><a>[Transcripts]</a> <cite><a href="http://curiousdannii.github.com/if/transcripts.html">IF Transcripts Protocol.</a></cite> 2010. Dannii Willis.</li>
+
+	<li id="vorple"><a>[Vorple]</a> <cite><a href="http://vorple-if.com">Vorple JavaScript user interface library.</a></cite> 2012. Juhana Leinonen.</li>
 
 	<li id="zoom"><a>[Zoom]</a> <cite><a href="http://www.logicalshift.co.uk/unix/zoom/">Zoom - Z-Machine interpreter.</a></cite> 2009. Andrew Hunter.</li>
 </dl>
