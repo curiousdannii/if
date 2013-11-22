@@ -1,0 +1,80 @@
+! A smarter press-any-key function will ignore scrolling keys
+! This code checks that we've got them all
+! by Dannii
+
+Global gg_mainwin = 0;
+Array gg_event --> 4;
+
+Array badkeys --> 20;
+
+[ Main key i;
+
+	#Ifdef TARGET_GLULX;
+		@setiosys 2 0; ! select Glk I/O system
+
+		! Open a text-buffer window, and select it as the current output stream.
+		gg_mainwin = glk( $0023, 0, 0, 0, 3, 0 ); ! glk_window_open
+		glk( $002F, gg_mainwin ); ! glk_set_window
+	#Endif; ! TARGET_GLULX
+
+	print "Press any key...^^";
+	print "A smarter press-any-key function will ignore scrolling keys. To help me (Dannii) write an ideal press-any-key function, please press the following keys. If any of them show a number, please report that back to me.^^";
+	print "  Enter^  Space^  Up & Dn arrow keys^  PgUp & PgDn^  and your mouse scroll wheel^^";
+	print "Press Q to quit.^^";
+
+	while ( 1 )
+	{
+		key = GetKey();
+		if ( key == 81 or 113 )
+		{
+			quit;
+		}
+		#Ifdef TARGET_ZCODE;
+		if ( key == 13 or 32 or 63 or 129 or 130 or 132 )
+		{
+			continue;
+		}
+		#Ifnot; ! TARGET_GLULX
+		if ( key == 32 or -4 or -5 or -6 or -11 or -12 or -13 )
+		{
+			continue;
+		}
+		#Endif; ! TARGET_
+		for ( i = 0 : i < 20 : i++ )
+		{
+			if ( badkeys-->i == key )
+			{
+				break;
+			}
+			if ( badkeys-->i == 0 )
+			{
+				badkeys-->i = key;
+				print key, "^";
+				break;
+			}
+		}
+	}
+];
+
+[ GetKey val;
+
+	#Ifdef TARGET_ZCODE;
+		@read_char 1 -> val;
+		return val;
+	#Ifnot; ! TARGET_GLULX
+		glk( $00D2, gg_mainwin ); ! request_char_event
+		while ( 1 )
+		{
+			glk( $00C0, gg_event ); ! select
+			switch ( gg_event-->0 )
+			{
+				2: ! evtype_CharInput
+					if ( gg_event-->1 == gg_mainwin )
+					{
+						return gg_event-->2;
+					}
+			}
+		}
+	#Endif; ! TARGET_
+	
+];
