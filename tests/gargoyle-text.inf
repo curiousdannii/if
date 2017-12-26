@@ -1,0 +1,101 @@
+! Tests for Gargoyle's text formatting extensions
+
+! New definitions
+
+Constant gestalt_GarglkText = $1100;
+
+[ garglk_set_zcolors _vararg_count;
+    ! garglk_set_zcolors( fg, bg )
+    @glk $1100 _vararg_count 0;
+    return 0;
+];
+
+[ garglk_set_zcolors_stream _vararg_count;
+    ! garglk_set_zcolors_stream( str, fg, bg )
+    @glk $1101 _vararg_count 0;
+    return 0;
+];
+
+[ garglk_set_reversevideo _vararg_count;
+    ! garglk_set_reversevideo( reverse )
+    @glk $1102 _vararg_count 0;
+    return 0;
+];
+
+[ garglk_set_reversevideo_stream _vararg_count;
+    ! garglk_set_reversevideo_stream( str, reverse )
+    @glk $1103 _vararg_count 0;
+    return 0;
+];
+
+! Test code
+
+Global mainwin = 0;
+Array gg_event --> 4;
+
+Array colours --> $ff0000 $ff3000 $ff6000 $ff9000 $ffc000 $fff000 $deff00 $aeff00
+    $7eff00 $4eff00 $1eff00 $00ff12 $00ff42 $00ff72 $00ffa2 $00ffd2
+    $00fcff $00ccff $009cff $006cff $003cff $000cff $2400ff $5400ff
+    $8400ff $b400ff $e400ff $ff00ea $ff00ba $ff008a $ff005a $ff002a;
+
+[ Main val str i;
+
+    @setiosys 2 0; ! select Glk I/O system
+    mainwin = glk( 35, 0, 0, 0, 3, 0 ); ! glk_window_open
+    glk( 47, mainwin ); ! glk_set_window
+    str = glk( 44, mainwin ); !glk_window_get_stream
+
+    print "Gargoyle's text formatting extensions^^";
+
+    val = glk( 4, gestalt_GarglkText, 0 ); !glk_gestalt
+
+    if ( ~~val )
+    {
+        print "Interpreter does not claim to support Gargoyle's text formatting extensions.^^";
+    }
+    else
+    {
+        print "Interpreter claims to support Gargoyle's text formatting extensions.^^";
+
+        print "Testing colours. You should see a pretty rainbow.^^";
+		for ( i = 0 : i < 16 : i++ )
+		{
+			val = colours-->i;
+            garglk_set_zcolors( -2, val );
+			print " ";
+		}
+		for ( i = 16 : i < 32 : i++ )
+		{
+			val = colours-->i;
+            garglk_set_zcolors_stream( str, -2, val );
+			print " ";
+		}
+        garglk_set_zcolors_stream( str, -2, -1 );
+
+        print "Testing reverse mode. You should see a striped bar.^^";
+
+        garglk_set_zcolors( $ff0000, $0000ff );
+        print "    ";
+        garglk_set_reversevideo( 1 );
+        print "    ";
+        garglk_set_reversevideo( 0 );
+        print "    ";
+        garglk_set_reversevideo_stream( str, 1 );
+        print "    ";
+        garglk_set_reversevideo_stream( str, 0 );
+        print "    ";
+        garglk_set_zcolors( -1, -1 );
+    }
+
+    ! Wait for any key
+    glk( $00D2, mainwin ); ! request_char_event
+    while ( 1 )
+    {
+        glk( $00C0, gg_event ); ! select
+        if ( gg_event-->0 == 2 && gg_event-->1 == mainwin )
+        {
+            @quit;
+        }
+    }
+
+];
