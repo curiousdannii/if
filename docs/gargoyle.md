@@ -41,4 +41,4 @@ void garglk_set_reversevideo( glui32 reverse );
 void garglk_set_reversevideo_stream( strid_t str, glui32 reverse );
 ```
 
-These functions set the reverse mode. Pass a non-zero `reverse` parameter to enable reverse mode, and pass 0 to disable reverse mode. Use `garglk_set_reversevideo` to specify a stream, or `garglk_set_reversevideo_stream` to modify the current stream.
+These functions set the reverse mode. Pass a non-zero `reverse` parameter to enable reverse mode, and pass 0 to disable reverse mode. Use `garglk_set_reversevideo_stream` to specify a stream, or `garglk_set_reversevideo` to modify the current stream.
