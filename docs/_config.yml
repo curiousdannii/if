@@ -1,0 +1,13 @@
+author: Dannii Willis
+description: Specifications and tests for my IF tech
+email: curiousdannii@gmail.com
+encoding: UTF-8
+future: true
+gfm_quirks: paragraph_end
+github: [metadata]
+jailed: false
+kramdown:
+  input: GFM
+  hard_wrap: false
+theme: minima
+title: Dannii's IF Pages

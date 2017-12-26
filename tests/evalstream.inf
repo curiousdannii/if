@@ -1,5 +1,4 @@
 ! eval() stream examples and unit tests
-! Currently only for Z-Machine
 ! by Dannii
 
 Constant HDR_SPECREVISION  $32;
@@ -7,7 +6,8 @@ Constant HDR_SPECREVISION  $32;
 Global gg_mainwin = 0;
 Array gg_event --> 4;
 
-Array streambuf buffer 200;
+Constant bufferlength = 200;
+Array buffer buffer (bufferlength + 2)*WORDSIZE;
 
 [ Main val done;
 
@@ -58,12 +58,48 @@ Array streambuf buffer 200;
 ];
 
 [ PrintBuffer addr i len;
+	#Ifdef TARGET_ZCODE;
 	len = addr-->0;
 	addr = addr + 2;
+	#Ifnot; ! TARGET_GLULX
+	len = buffer + (bufferlength + 1)*WORDSIZE;
+	#Endif; ! TARGET_
 	for (i=0: i < len: i++) print (char) addr->i;
 ];
 
-[ Test val ;
+#Ifdef TARGET_GLULX;
+[ glk_gestalt _vararg_count ret;
+  ! glk_gestalt(uint, uint) => uint
+  @glk 4 _vararg_count ret;
+  return ret;
+];
+
+[ glk_stream_close _vararg_count;
+  ! glk_stream_close(stream, &{uint, uint})
+  @glk 68 _vararg_count 0;
+  return 0;
+];
+
+[ glk_stream_set_current _vararg_count;
+  ! glk_stream_set_current(stream)
+  @glk 71 _vararg_count 0;
+  return 0;
+];
+
+[ glk_stream_open_eval _vararg_count ret;
+  ! glk_stream_open_memory(nativechararray, arraylen, uint) => stream
+  @glk $1100 _vararg_count ret;
+  return ret;
+];
+
+[ glk_stream_open_eval_uni _vararg_count ret;
+  ! glk_stream_open_memory(nativechararray, arraylen, uint) => stream
+  @glk 313 _vararg_count ret;
+  return ret;
+];
+#Endif;
+
+[ Test val stream results;
 	
 	#Ifdef TARGET_ZCODE;
 		! Check we're in a 1.2 version interpreter
@@ -78,19 +114,35 @@ Array streambuf buffer 200;
 	#Endif; ! TARGET_ZCODE
 
 	! Checking for eval() stream support
-	if ( Gestalt($30, 0, 0) == 0 )
+	#Ifdef TARGET_ZCODE;
+	val = Gestalt( $30, 0, 0 );
+	#Ifnot; ! TARGET_GLULX
+	val = 1;!glk( 4, $1100, 0 );
+	#Endif; ! TARGET_
+	if ( val == 0 )
 	{
 		print "Stopping, no support for the eval() stream.^";
 		return;
 	}
 	
-	@output_stream 5 streambuf;
+	#Ifdef TARGET_ZCODE;
+	@output_stream 5 buffer;
+	#Ifnot; ! TARGET_GLULX
+	stream = glk_stream_open_eval_uni( buffer, bufferlength, 1,0 );
+	glk_stream_set_current( stream );
+	#Endif; ! TARGET_
 	
 	print "alert(~The eval() stream is supported.~);";
 	
 	print "navigator.userAgent";
 	
+	#Ifdef TARGET_ZCODE;
 	@output_stream (-5);
+	#Ifnot; ! TARGET_GLULX
+	results = buffer + bufferlength*WORDSIZE;
+	glk_stream_close( stream, results );
+	glk( $002F, gg_mainwin );
+	#Endif; ! TARGET_
 
-	print "Your userAgent: "; PrintBuffer(streambuf);
+	print "Your userAgent: "; PrintBuffer( buffer );
 ];
