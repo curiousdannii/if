@@ -5,6 +5,7 @@ encoding: UTF-8
 future: true
 gfm_quirks: paragraph_end
 github: [metadata]
+github_username: curiousdannii
 jailed: false
 kramdown:
   input: GFM
