@@ -58,18 +58,18 @@ Array colours --> $ff0000 $ff3000 $ff6000 $ff9000 $ffc000 $fff000 $deff00 $aeff0
         print "Interpreter claims to support Gargoyle's text formatting extensions.^^";
 
         print "Testing colours. You should see a pretty rainbow.^^";
-		for ( i = 0 : i < 16 : i++ )
-		{
-			val = colours-->i;
+        for ( i = 0 : i < 16 : i++ )
+        {
+            val = colours-->i;
             garglk_set_zcolors( -2, val );
-			print " ";
-		}
-		for ( i = 16 : i < 32 : i++ )
-		{
-			val = colours-->i;
+            print " ";
+        }
+        for ( i = 16 : i < 32 : i++ )
+        {
+            val = colours-->i;
             garglk_set_zcolors_stream( str, -2, val );
-			print " ";
-		}
+            print " ";
+        }
         garglk_set_zcolors_stream( str, -2, -1 );
 
         print "Testing reverse mode. You should see a striped bar.^^";
