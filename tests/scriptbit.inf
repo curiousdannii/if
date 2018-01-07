@@ -1,0 +1,40 @@
+! Test for the transcription bit
+! by Dannii
+
+[ Main val;
+	print "Test for the transcription bit^^";
+	Clearbit();
+	Testfunc();
+	print "^^Above should appear 'AAAABBBB'.^^";
+	print "Now trying again, but without the safety of input requests.^^";
+	Clearbit();
+	Testfunc2();
+	print "^^Above should appear 'AAAABBBB'.";
+	@read_char 1 -> val;
+];
+
+[ Clearbit i;
+	i = 0->$11;
+	i = i & $FE;
+	0->$11 = i;
+	@output_stream (-2);
+];
+
+[ Testfunc i val;
+	print "AAAA";
+	i = 0->$11;
+	i = i | 1;
+	0->$11 = i;
+	@read_char 1 -> val;
+	print "BBBB";
+	@read_char 1 -> val;
+	rfalse;
+];
+
+[ Testfunc2 i;
+	print "AAAA";
+	i = 0->$11;
+	i = i | 1;
+	0->$11 = i;
+	print "BBBB";
+];
