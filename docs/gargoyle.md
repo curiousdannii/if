@@ -10,7 +10,7 @@ layout: default
 
 These functions allow you to control colours and reverse styling at character granularity. This is needed for fully implementing a Z-Machine interpreter in Glk, as [Glk's style system](http://eblong.com/zarf/glk/glk-spec-075_5.html#s.5) isn't powerful enough. But it could also be used directly by authors.
 
-Support for these functions can be tested with `gestalt_GarglkText` (Gestalt code `0x1100`).
+Support for these functions can be tested with `gestalt_GarglkText` (Gestalt code `0x1100`). You can also make a preprocessor test for `GLK_MODULE_GARGLKTEXT`.
 
 Resources:
 
