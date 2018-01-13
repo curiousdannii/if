@@ -7,3 +7,4 @@ layout: default
 ## Glk extensions
 
  - [Gargoyle extensions](gargoyle.md)
+ - [Out-of-band messaging](outofband.md)
