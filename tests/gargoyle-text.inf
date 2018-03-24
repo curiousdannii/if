@@ -41,11 +41,20 @@ Array colours --> $ff0000 $ff3000 $ff6000 $ff9000 $ffc000 $fff000 $deff00 $aeff0
 [ Main val str i;
 
     @setiosys 2 0; ! select Glk I/O system
+
+    ! Set user1 and user2 styles
+    glk( 176, 0, 9, 6, 0 ); !glk_stylehint_set user1 preformatted
+    glk( 176, 0, 9, 7, $00ff00 ); !glk_stylehint_set user1 green
+    glk( 176, 0, 9, 9, 0 ); !glk_stylehint_set user1 reverse off
+    glk( 176, 0, 10, 6, 0 ); !glk_stylehint_set user2 preformatted
+    glk( 176, 0, 10, 9, 1 ); !glk_stylehint_set user2 reverse on
+
     mainwin = glk( 35, 0, 0, 0, 3, 0 ); ! glk_window_open
     glk( 47, mainwin ); ! glk_set_window
     str = glk( 44, mainwin ); !glk_window_get_stream
 
-    print "Gargoyle's text formatting extensions^^";
+    print "Tests for Gargoyle's text formatting extensions^";
+    print "https://curiousdannii.github.io/if/gargoyle.html^^";
 
     val = glk( 4, gestalt_GarglkText, 0 ); !glk_gestalt
 
@@ -58,6 +67,7 @@ Array colours --> $ff0000 $ff3000 $ff6000 $ff9000 $ffc000 $fff000 $deff00 $aeff0
         print "Interpreter claims to support Gargoyle's text formatting extensions.^^";
 
         print "Testing colours. You should see a pretty rainbow.^^";
+        glk( 134, 2 ); !glk_set_style preformatted
         for ( i = 0 : i < 16 : i++ )
         {
             val = colours-->i;
@@ -71,9 +81,11 @@ Array colours --> $ff0000 $ff3000 $ff6000 $ff9000 $ffc000 $fff000 $deff00 $aeff0
             print " ";
         }
         garglk_set_zcolors_stream( str, -2, -1 );
+        glk( 134, 0 ); !glk_set_style normal
 
-        print "Testing reverse mode. You should see a striped bar.^^";
+        print "^^Testing reverse mode. You should see a striped bar.^^";
 
+        glk( 134, 2 ); !glk_set_style preformatted
         garglk_set_zcolors( $ff0000, $0000ff );
         print "    ";
         garglk_set_reversevideo( 1 );
@@ -83,8 +95,29 @@ Array colours --> $ff0000 $ff3000 $ff6000 $ff9000 $ffc000 $fff000 $deff00 $aeff0
         garglk_set_reversevideo_stream( str, 1 );
         print "    ";
         garglk_set_reversevideo_stream( str, 0 );
-        print "    ";
+        print "  ";
         garglk_set_zcolors( -1, -1 );
+
+        ! Now use the user1 and user2 styles to check that the stylehints follow Gargoyle's rules:
+        ! Colour style hints do not overwrite manually specified styles
+        ! But reverse mode works differently: reverse mode is used if either the style or garglk_set_reversevideo turns it on
+
+        garglk_set_zcolors( $ff0000, $0000ff );
+        glk( 134, 9 ); !glk_set_style user1
+        print "  ";
+        garglk_set_reversevideo( 1 );
+        print "  ";
+        glk( 134, 9 ); !glk_set_style user1
+        print "  ";
+        garglk_set_reversevideo( 0 );
+        print "    ";
+        glk( 134, 10 ); !glk_set_style user2
+        print "  ";
+        garglk_set_reversevideo( 0 );
+        print "  ";
+
+        garglk_set_zcolors( -1, -1 );
+        glk( 134, 0 ); !glk_set_style normal
     }
 
     ! Wait for any key

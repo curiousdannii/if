@@ -32,7 +32,9 @@ These functions set the current text foreground and background colours. Each str
 
 Colour numbers are encoded RGB values in the same way as the [`stylehint_TextColor` style hint](http://eblong.com/zarf/glk/glk-spec-075_5.html#s.5.1).
 
-The negative colour numbers are special codes with the same meanings as those from the [Z-Machine section 8.3.7](http://inform-fiction.org/zmachine/standards/z1point1/sect08.html#three). To change only the foreground colour or only the background colour, pass `-2` for the other parameter, which will keep the current colour unchanged. Pass `-1` to reset to the current style's foreground or background colour.
+The negative colour numbers are special codes with the same meanings as those from the [Z-Machine section 8.3.7](http://inform-fiction.org/zmachine/standards/z1point1/sect08.html#three). To change only the foreground colour or only the background colour, pass `zcolor_Current` or `-2` for the other parameter, which will keep the current colour unchanged. Pass `zcolor_Default` or `-1` to reset to the current style's foreground or background colour.
+
+Switching to a style which has a colour stylehint set will not override the colours specified with these functions. These colours will continue to be used until you disable them with `zcolor_Default`, after which the style's colour stylehints will be used.
 
 ### Reverse mode
 
@@ -44,3 +46,5 @@ void garglk_set_reversevideo_stream( strid_t str, glui32 reverse );
 ```
 
 These functions set the reverse mode. Pass a non-zero `reverse` parameter to enable reverse mode, and pass 0 to disable reverse mode. Use `garglk_set_reversevideo_stream` to specify a stream, or `garglk_set_reversevideo` to modify the current stream.
+
+Unlike colours, reverse mode stylehints do interact with these functions: reverse mode will be used if either the current style has a stylehint enabling it, or if it has been enabled by these functions. When stylehints enable reverse mode, you cannot call `garglk_set_reversevideo` to disable it; you can only disable reverse mode by switching to another style.
