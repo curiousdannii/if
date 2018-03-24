@@ -15,6 +15,7 @@ Support for these functions can be tested with `gestalt_GarglkText` (Gestalt cod
 Resources:
 
  - Test file: [gargoyle-text.inf](https://github.com/curiousdannii/if/blob/master/tests/gargoyle-text.inf), [gargoyle-text.ulx](https://github.com/curiousdannii/if/blob/master/tests/gargoyle-text.ulx)
+ - Inform 7 extension: [Glk Text Formatting.i7x](https://github.com/i7/extensions/blob/master/Dannii%20Willis/Glk%20Text%20Formatting.i7x)
 
 ### Colours
 
