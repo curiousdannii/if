@@ -6,7 +6,7 @@ layout: default
 
 These functions add support for out-of-band logging and error messaging. If provided by the Glk library, they give a way of sending messages outside the normal Glk window display system. They can be safely called before any windows have been created, on platforms which only allow one window to be created, and they should be highly efficient and not depend on receiving a response from the client in a server-client network setup.
 
-Support for these functions can be tested with `gestalt_OutOfBand` (Gestalt code `0x1110`). You can also make a preprocessor test for `GLK_MODULE_OUTOFBAND`.
+Support for these functions can be tested with `gestalt_OutOfBand` (Gestalt code `TBA`). You can also make a preprocessor test for `GLK_MODULE_OUTOFBAND`.
 
 ## Message severity levels
 
@@ -27,25 +27,25 @@ Three severity levels are supported.
 ## Functions
 
 ```c
-/* Function code: 0x1110 */
+/* Function code: TBA */
 void glk_outofband( glui32 severity, char *s );
-/* Function code: 0x1111 */
+/* Function code: TBA */
 void glk_outofband_uni( glui32 severity, glui32 *s );
 ```
 
 These functions send a string message of the specified severity.
 
 ```c
-/* Function code: 0x1112 */
+/* Function code: TBA */
 void glk_stream_open_outofband( glui32 severity );
-/* Function code: 0x1113 */
+/* Function code: TBA */
 void glk_stream_open_outofband_uni( glui32 severity );
 ```
 
 These functions open an out-of-band stream of the specified severity, allowing you to send dynamic messages. The stream can be written to with all of the regular printing functions. The message is sent once you call `glk_stream_close`.
 
 ```c
-/* Function code: 0x1114 */
+/* Function code: TBA */
 void glk_cancel_outofband_warning( void );
 ```
 
