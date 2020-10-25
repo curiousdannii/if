@@ -7,7 +7,7 @@ gfm_quirks: paragraph_end
 github: [metadata]
 github_username: curiousdannii
 google_analytics: UA-7949545-4
-header_pages: []
+header_pages: ['']
 jailed: false
 kramdown:
   input: GFM
