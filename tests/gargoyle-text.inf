@@ -38,6 +38,17 @@ Array colours --> $ff0000 $ff3000 $ff6000 $ff9000 $ffc000 $fff000 $deff00 $aeff0
     $00fcff $00ccff $009cff $006cff $003cff $000cff $2400ff $5400ff
     $8400ff $b400ff $e400ff $ff00ea $ff00ba $ff008a $ff005a $ff002a;
 
+[ Wait; 
+    ! Wait for any key
+    glk($00D2, mainwin); ! request_char_event
+    while (1) {
+        glk($00C0, gg_event); ! select
+        if (gg_event-->0 == 2 && gg_event-->1 == mainwin) {
+            return;
+        }
+    }
+];
+
 [ Main val str i;
 
     @setiosys 2 0; ! select Glk I/O system
@@ -118,17 +129,37 @@ Array colours --> $ff0000 $ff3000 $ff6000 $ff9000 $ffc000 $fff000 $deff00 $aeff0
 
         garglk_set_zcolors( -1, -1 );
         glk( 134, 0 ); !glk_set_style normal
+
+        print "^^Press any key to test clearing the screen.";
+        Wait();
+
+        ! Set colours to Jonquil on burgandy
+        garglk_set_zcolors($F4CA16, $800020);
+
+        ! Clear the screen, and show a message
+        glk(42, mainwin); !glk_window_clear
+        print "^This message should be shown in jonquil on burgandy.^^";
+
+        print "Now press any key to test clearing the screen, with other style changes in the same batch of output.";
+        Wait();
+
+        ! Clear the screen, and show a message
+        glk(42, mainwin); !glk_window_clear
+        print "^This message should be shown in jonquil on burgandy.^^";
+
+        print "Test some styles: ";
+        glk(134, 4); !glk_set_style subheader
+        print "subheader/bold ";
+        glk(134, 1); !glk_set_style emphasized
+        print "emphasized/italics ";
+        glk(134, 2); !glk_set_style preformatted
+        print "preformatted ";
+
+        ! Now back to normal
+        garglk_set_zcolors(-1, -1);
+        glk(134, 0); !glk_set_style normal
+        print "^^And back to normal.";
     }
 
-    ! Wait for any key
-    glk( $00D2, mainwin ); ! request_char_event
-    while ( 1 )
-    {
-        glk( $00C0, gg_event ); ! select
-        if ( gg_event-->0 == 2 && gg_event-->1 == mainwin )
-        {
-            @quit;
-        }
-    }
-
+    Wait();
 ];
