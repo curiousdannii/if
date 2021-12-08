@@ -49,6 +49,11 @@ Array colours --> $ff0000 $ff3000 $ff6000 $ff9000 $ffc000 $fff000 $deff00 $aeff0
     }
 ];
 
+[ Reset;
+    garglk_set_zcolors( -1, -1 );
+    glk(177, 0, 0, 8); !glk_stylehint_clear normal background
+];
+
 [ Main val str i;
 
     @setiosys 2 0; ! select Glk I/O system
@@ -130,23 +135,37 @@ Array colours --> $ff0000 $ff3000 $ff6000 $ff9000 $ffc000 $fff000 $deff00 $aeff0
         garglk_set_zcolors( -1, -1 );
         glk( 134, 0 ); !glk_set_style normal
 
-        print "^^Press any key to test clearing the screen.";
+        print "^^Press any key to begin the screen clearing tests.";
         Wait();
 
+        ! Test 1: Setting window margins with a stylehint
+        glk(176, 0, 0, 8, $1F75FE); !glk_stylehint_set normal background Crayola blue
+        glk(42, mainwin); !glk_window_clear
+        print "Test 1: Setting window margins with a stylehint.^^If supported, the window margin should be Crayola blue. This window should still have the default background however.^^Press any key to continue.";
+        Wait();
+
+        ! Test 2: Setting window margins with garglk_set_zcolors, then a stylehint
+        Reset();
+        garglk_set_zcolors(-1, $800020);
+        glk(176, 0, 0, 8, $1F75FE); !glk_stylehint_set normal background Crayola blue
+        glk(42, mainwin); !glk_window_clear
+        print "Test 2: Setting window margins with garglk_set_zcolors, then a stylehint.^^If supported, this window should have a burgandy background, while the window margin should be Crayola blue.^^Press any key to continue.";
+        Wait();
+
+        ! Test 3: Setting window margins with a stylehint, then garglk_set_zcolors
+        Reset();
+        glk(176, 0, 0, 8, $1F75FE); !glk_stylehint_set normal background Crayola blue
+        garglk_set_zcolors(-1, $800020);
+        glk(42, mainwin); !glk_window_clear
+        print "Test 3: Setting window margins with a stylehint, then with garglk_set_zcolors.^^If supported, this window and the window margin should both be burgandy.^^Press any key to continue.";
+        Wait();
+
+        ! Test 4: Set foreground colour too
+        Reset();
         ! Set colours to Jonquil on burgandy
         garglk_set_zcolors($F4CA16, $800020);
-
-        ! Clear the screen, and show a message
         glk(42, mainwin); !glk_window_clear
-        print "^This message should be shown in jonquil on burgandy.^^";
-
-        print "Now press any key to test clearing the screen, with other style changes in the same batch of output.";
-        Wait();
-
-        ! Clear the screen, and show a message
-        glk(42, mainwin); !glk_window_clear
-        print "^This message should be shown in jonquil on burgandy.^^";
-
+        print "Test 4: Foreground colour and text styles.^^This message should be shown in jonquil on burgandy.^^";
         print "Test some styles: ";
         glk(134, 4); !glk_set_style subheader
         print "subheader/bold ";
@@ -154,11 +173,26 @@ Array colours --> $ff0000 $ff3000 $ff6000 $ff9000 $ffc000 $fff000 $deff00 $aeff0
         print "emphasized/italics ";
         glk(134, 2); !glk_set_style preformatted
         print "preformatted ";
-
-        ! Now back to normal
-        garglk_set_zcolors(-1, -1);
         glk(134, 0); !glk_set_style normal
-        print "^^And back to normal.";
+        print "^^Press any key to continue.";
+        Wait();
+
+        ! Test 5: Use garglk_set_zcolors after clearing the window
+        Reset();
+        glk(42, mainwin); !glk_window_clear
+        print "Test 5: Use garglk_set_zcolors after clearing the window.^^The function call should have no effect.^^Press any key to continue.";
+        garglk_set_zcolors($F4CA16, $800020);
+        Wait();
+
+
+        ! Test 6: Test clear styles after clearing the window
+        Reset();
+        garglk_set_zcolors($F4CA16, $800020);
+        glk(42, mainwin); !glk_window_clear
+        print "Test 6: Test clearing styles after clearing the window.^^This window should be jonquil on burgandy.";
+        Reset();
+
+        print "^^End of tests.";
     }
 
     Wait();
