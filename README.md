@@ -1,6 +1,6 @@
 Dannii's Interactive Fiction site
 =================================
 
-Please view my IF site at [http://curiousdannii.github.com/if/](http://curiousdannii.github.com/if/).
+Please view my IF site at https://curiousdannii.github.io/if/.
 
 Unless otherwise noted files in this repository are released to the public domain.
