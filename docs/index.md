@@ -9,6 +9,7 @@ layout: default
 ### Glk extensions
 
  - [Gargoyle extensions](gargoyle.md)
+ - [Miscellaneous Glk Extensions](misc-glk.md)
  - [Out-of-band messaging (proposal)](outofband.md)
 
 ### Z-Machine

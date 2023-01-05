@@ -1,0 +1,371 @@
+!\
+	CORETEST.HUG
+	Testing of core engine functions
+
+	(The order of definitions in this file is significant, as
+	some of the tests--e.g., RoutineCalling--depend on particular
+	objects/properties/etc. having specific numbers.)
+\!
+
+$MAXDICTEXTEND=32
+
+constant HUGO_VERSION "v2.5"
+
+#switches -d
+
+global errors
+
+routine main
+{
+	local r
+	local transcription
+
+	"Testing core functions of Hugo ";
+	print HUGO_VERSION; "\n"
+
+!	"Save output transcription? ";
+!	pause
+!	print ""
+
+!	if word[0] = 'y' or word[0] = 'Y'
+!	{
+!		r = scripton
+!		if r:  transcription = true
+!	}
+
+	MathTests               ! basic math
+
+	PropAttrTests           ! property/attribute tests
+
+	RoutineCalling          ! routine calling tests
+
+	InitTests               ! initialization tests
+
+	Overflow                ! overflow tests
+
+	DictTests               ! dictionary tests
+	
+	"\nTests complete:  ";
+	if errors
+		print "\B"; number errors; " error(s)\b"
+	else
+		print "No errors"
+!	"Press a key...";
+!	pause
+
+	if transcription:  r = scriptoff
+
+	return
+}
+
+!----------------------------------------------------------------------------
+! BASIC MATH TESTS:
+
+routine MathTests
+{
+	local a = 10
+	local b = 20
+	local c = 5
+	local r
+
+	"\nBASIC MATH TESTS:"
+	"-----------------"
+	print "a = "; number a ; ", b = "; number b; ", c = "; number c; "\n"
+
+	"a + b * c = ";
+	r = a + b * c
+	print number r; Test(r, 110);
+
+	"b / c + a = ";
+	r = b / c + a
+	print number r; Test(r, 14);
+
+	"b / a / c = ";
+	r = b / a / c
+	print number r; Test(r, 0);
+
+	"b = 20 and a / 2 = c : ";
+	r = b = 20 and a / 2 = c
+	print IsTrue(r); Test(r, 1);
+
+	"b = 10 or a / 5 = c : ";
+	r = b = 10 or a / 5 = c
+	print IsTrue(r); Test(r, 0);
+
+	"b = 10 or a / 2 = c : ";
+	r = b = 10 or a / 2 = c
+	print IsTrue(r); Test(r, 1);
+
+	"a = 5 and b / 4 = c = 5 : ";
+	r = a = 5 and b / 4 = c = 5
+	print IsTrue(r); Test(r, 0);
+
+	"b / 4 = c = 1 : ";
+	r = b / 4 = c = 1
+	print IsTrue(r); Test(r, 1);
+
+	"c = b / 4 = 1 : ";
+	r = c = b / 4 = 1
+	print IsTrue(r); Test(r, 1);
+
+	"(a = 5 or b = 20) and (c = a / 2) : ";
+	r = (a = 5 or b = 20) and (c = a / 2)
+	print IsTrue(r); Test(r, 1);
+
+	"(a = 10) and (b = 5, 10, 15, 20, 25) : ";
+	if (a = 10) and (b = 5, 10, 15, 20, 25)
+		print "true";
+	else
+		print "false";
+	Test(((a = 10) and (b = 5, 10, 15, 20, 25)), 1)
+
+	"(a = 20, 10, 5) or (c = b / (2+2)) : ";
+	r = (a = 20, 10, 5) or (c = b / (2+2))
+	print IsTrue(r); Test(r, 1);
+}
+
+routine IsTrue(a)
+{
+	if a
+		"true";
+	else
+		"false";
+}
+
+routine Test(a, b)
+{
+	if a = b
+		" (PASSED)"
+	else
+	{
+		" \B(FAILED)\b"
+		errors++
+	}
+}
+
+!----------------------------------------------------------------------------
+! BASIC PROPERTY/ATTRIBUTE TESTS:
+
+routine PropAttrTests
+{
+	local i, r
+
+	"\nBASIC PROPERTY/ATTRIBUTE TESTS:"
+	"-------------------------------"
+
+	print "obj0.prop0 = "; obj0.prop0.name; " ";
+	Test(obj0.prop0.name, "obj1")
+	print "obj0.prop0.prop1 = "; obj0.prop0.prop1.name;
+	Test(obj0.prop0.prop1.name, "obj2")
+
+	print "obj0.prop0.prop1.prop1 = "; number VERIFY2;
+	Test(obj0.prop0.prop1.prop1, VERIFY2)
+
+	print "obj0.(obj1.prop0) = "; number VERIFY1;
+	Test(obj0.(obj1.prop0), VERIFY1)
+
+	print "++obj0.prop1 = "; number ++obj0.prop1;
+	--obj0.prop1
+	++obj0.prop1
+	Test(obj0.prop1, VERIFY1+1)
+	print "obj0.prop1++ = "; number obj0.prop1++;
+	obj0.prop1--
+	obj0.prop1++
+	Test(obj0.prop1, VERIFY1+2)
+	print "obj0.prop1 = "; number obj0.prop1;
+	Test(obj0.prop1, VERIFY1+2)
+
+	print "++obj1.prop1.prop1 = "; number ++obj1.prop1.prop1;
+	--obj1.prop1.prop1
+	++obj1.prop1.prop1
+	Test(obj1.prop1.prop1, VERIFY2+1)
+	print "obj1.prop1.prop1++ = "; number obj1.prop1.prop1++;
+	obj1.prop1.prop1--
+	obj1.prop1.prop1++
+	Test(obj1.prop1.prop1, VERIFY2+2)
+	print "obj1.prop1.prop1 = "; number obj1.prop1.prop1;
+	Test(obj1.prop1.prop1, VERIFY2+2)
+
+	for (i=1; i<=2; i++)
+	{
+		print "obj0.prop0 is attr0 = ";
+		r = obj0.prop0 is attr0
+		print IsTrue(r); Test(r, (i = 1), 5);
+
+		"obj0.prop0.prop1 is attr0 = ";
+		r = obj0.prop0.prop1 is attr0
+		print IsTrue(r); Test(r, (i = 2));
+
+		"obj0.prop0.prop1 is attr1 = ";
+		r = obj0.prop0.prop1 is attr1
+		print IsTrue(r); Test(r, (i = 1));
+
+		if i = 2:  break
+
+		"(Changing attributes)"
+		obj0.prop0 is not attr0
+		obj0.prop0.prop1 is attr0
+		obj0.prop0.prop1 is not attr1
+	}
+}
+
+attribute attr0
+attribute attr1
+
+property prop0
+property prop1
+
+constant VERIFY1 99
+constant VERIFY2 1234
+constant VERIFY3 -50
+
+object obj0 "obj0"
+{
+	prop0 obj1
+	prop1 VERIFY1
+	is attr0
+}
+
+object obj1 "obj1"
+{
+	prop0 prop1
+	prop1 obj2
+	is attr0
+}
+
+object obj2 "obj2"
+{
+	prop0 VERIFY3
+	prop1 VERIFY2
+	is attr1
+}
+
+!----------------------------------------------------------------------------
+! ROUTINE CALLING TESTS:
+
+routine RoutineCalling
+{
+	local a = 1
+	local b = 2
+	local c = 4
+	local r
+
+	"\nROUTINE CALLING TESTS:"
+	"----------------------"
+	print "a = "; number a ; ", b = "; number b; ", c = "; number c; "\n"
+      
+	"Double(a + b * c) = ";
+	r = Double(a + b * c)
+	print number r; Test(r, 18);
+
+	"Double((a + Double(c)) / (a + b)) = ";
+	r = Double((a + Double(c)) / (a + b))
+	print number r; Test(r, 6);
+
+	"Double(a).prop0 = ";
+	r = Double(a).prop0
+	print number r; Test(r, VERIFY3);
+
+	"++Double(a).prop0 = ";
+	r = ++Double(a).prop0
+	print number r; Test(r, VERIFY3+1);
+}
+
+routine Double(n)
+{
+	return n*2
+}
+
+!----------------------------------------------------------------------------
+! INITIALIZATION TESTS:
+
+property p1
+property p2 25
+property p3 -25
+
+global g1
+global g2 = 35
+global g3 = -35
+
+constant c1 4
+constant c2 -5
+
+enumerate start = 5, step * -2
+{
+	e1, e2, e3, e4 = -10, e5
+}
+
+object o1
+{}
+
+routine InitTests
+{
+	"\nINITIALIZATION TESTS:"
+	"---------------------"
+
+#message "(NOTE:  The following six warnings are expected)"
+	print "Properties:  "; number o1.p1; ", "; number o1.p2; ", "; \
+		number o1.p3;
+	Test((o1.p1 = 0 and o1.p2 = 25 and o1.p3 = -25), 1)
+
+	print "Globals:  "; number g1; ", "; number g2; ", "; number g3;
+	Test((g1 = 0 and g2 = 35 and g3 = -35), 1)
+
+	print "Constants:  "; number c1; ", "; number c2;
+	Test((c1 = 4 and c2 = -5), 1)
+
+	print "Enumerated constants:  "; number e1; ", "; number e2; ", "; \
+		number e3; ", "; number e4; ", "; number e5;
+	Test((e1 = 5 and e2 = -10 and e3 = 20 and e4 = -10 and e5 = 20), 1)
+}
+
+!----------------------------------------------------------------------------
+! OVERFLOW TESTS:
+
+routine Overflow
+{
+	local n = 32767
+
+	"\nOVERFLOW TESTS:"
+	"---------------"
+
+	print "n = "; number n
+	""
+
+	print "++n = "; number ++n;
+	Test(n, -32768)
+	print "n-=5 = "; number n-=5;
+	Test(n, 32763)
+	n = n + 10
+	print "n + 10 = "; number n;
+	Test(n, -32763)
+	n = n * 20000
+	print "n * 20000 = "; number n;
+	Test(n, -31072)
+}
+
+!----------------------------------------------------------------------------
+! DICTIONARY TESTS:
+
+array apple[6]
+array apple2[6]
+
+routine DictTests
+{
+	local i, w
+
+	"\nDICTIONARY TESTS:"
+	"-----------------"
+
+	apple[0] = 'a', 'p', 'p', 'l', 'e'
+
+	w = dict(apple, 5)      ! w should become 30 (in dictionary table)
+	print "Testing dict(): "; number w; Test(w, 30);
+	
+	string(apple2, w, 5)
+	print "Testing string(): ";
+	for (i=0; i<5; i++)
+		printchar apple2[i]
+	Test((apple2[0]='a' and apple2[1]='p' and apple2[2]='p' and
+		apple2[3]='l' and apple2[4]='e'), 1)
+}
