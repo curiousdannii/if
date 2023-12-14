@@ -26,7 +26,7 @@ void glk_css_hint_set(glui32 wintype, glui32 styl, glui32 par_or_span,
 void glk_css_hint_set_num(glui32 wintype, glui32 styl, glui32 par_or_span,
     char *prop, glui32 proplen, glsi32 val);
 // Function code: TBA
-void glk_css_hint_set_clear(glui32 wintype, glui32 styl, glui32 par_or_span,
+void glk_css_hint_clear(glui32 wintype, glui32 styl, glui32 par_or_span,
     char *prop, glui32 proplen);
 
 #define CSS_Span (0)
@@ -45,7 +45,7 @@ void glk_css_hint_selector_set(char *sel, glui32 sellen,
 void glk_css_hint_selector_set_num(char *sel, glui32 sellen,
     char *prop, glui32 proplen, glsi32 val);
 // Function code: TBA
-void glk_css_hint_selector_set_clear(char *sel, glui32 sellen,
+void glk_css_hint_selector_clear(char *sel, glui32 sellen,
     char *prop, glui32 proplen);
 ```
 
@@ -75,7 +75,7 @@ void glk_css_inline_set(char *prop, glui32 proplen, char *val, glui32 vallen);
 // Function code: TBA
 void glk_css_inline_set_num(char *prop, glui32 proplen, glsi32 val);
 // Function code: TBA
-void glk_css_inline_set_clear(char *prop, glui32 proplen);
+void glk_css_inline_clear(char *prop, glui32 proplen);
 ```
 
 ### Non-standard CSS properties
