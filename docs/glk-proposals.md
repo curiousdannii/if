@@ -39,13 +39,13 @@ The `wintype` and `styl` have the same meanings as in the Glk stylehint function
 
 ```c
 // Function code: TBA
-void glk_css_hint_selector_set(char *sel, glui32 sellen,
+void glk_css_hint_selector_set(glui32 wintype, char *sel, glui32 sellen,
     char *prop, glui32 proplen, char *val, glui32 vallen);
 // Function code: TBA
-void glk_css_hint_selector_set_num(char *sel, glui32 sellen,
+void glk_css_hint_selector_set_num(glui32 wintype, char *sel, glui32 sellen,
     char *prop, glui32 proplen, glsi32 val);
 // Function code: TBA
-void glk_css_hint_selector_clear(char *sel, glui32 sellen,
+void glk_css_hint_selector_clear(glui32 wintype, char *sel, glui32 sellen,
     char *prop, glui32 proplen);
 ```
 
