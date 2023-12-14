@@ -18,11 +18,14 @@ These functions allow you to set arbitrary CSS styles *before* opening a window,
 
 ```c
 // Function code: TBA
-void glk_css_hint_set(glui32 wintype, glui32 styl, glui32 par_or_span, char *prop, glui32 proplen, char *val, glui32 vallen);
+void glk_css_hint_set(glui32 wintype, glui32 styl, glui32 par_or_span,
+    char *prop, glui32 proplen, char *val, glui32 vallen);
 // Function code: TBA
-void glk_css_hint_set_num(glui32 wintype, glui32 styl, glui32 par_or_span, char *prop, glui32 proplen, glsi32 val);
+void glk_css_hint_set_num(glui32 wintype, glui32 styl, glui32 par_or_span,
+    char *prop, glui32 proplen, glsi32 val);
 // Function code: TBA
-void glk_css_hint_set_clear(glui32 wintype, glui32 styl, glui32 par_or_span, char *prop, glui32 proplen);
+void glk_css_hint_set_clear(glui32 wintype, glui32 styl, glui32 par_or_span,
+    char *prop, glui32 proplen);
 
 #define CSS_Span (0)
 #define CSS_Paragraph (1)
@@ -34,11 +37,14 @@ The `wintype` and `styl` have the same meanings as in the Glk stylehint function
 
 ```c
 // Function code: TBA
-void glk_css_hint_selector_set(char *sel, glui32 sellen, char *prop, glui32 proplen, char *val, glui32 vallen);
+void glk_css_hint_selector_set(char *sel, glui32 sellen,
+    char *prop, glui32 proplen, char *val, glui32 vallen);
 // Function code: TBA
-void glk_css_hint_selector_set_num(char *sel, glui32 sellen, char *prop, glui32 proplen, glsi32 val);
+void glk_css_hint_selector_set_num(char *sel, glui32 sellen,
+    char *prop, glui32 proplen, glsi32 val);
 // Function code: TBA
-void glk_css_hint_selector_set_clear(char *sel, glui32 sellen, char *prop, glui32 proplen);
+void glk_css_hint_selector_set_clear(char *sel, glui32 sellen,
+    char *prop, glui32 proplen);
 ```
 
 These functions are for manually specifying the selector of a CSS rule. They are still scoped to a window, so send an empty `sel` buffer to target the window itself. If you want to replicate the standard paragraph and span selectors, they are specified as classes for each Glk style, with `_para` appended for paragraph styles. (The capitalisation is unfortunately the opposite of how they are in Glk.) Note that the `.` must be manually included.
