@@ -6,6 +6,8 @@ layout: default
 
 ## CSS
 
+[Forum discussion](https://intfiction.org/t/glk-extension-proposal-css/66228)
+
 These functions allow you to set arbitrary CSS styles. While of most use in a HTML-based interpreter, some non-HTML interpreters may supported small text formatting subsets of CSS.
 
 Support for these functions can be tested with `gestalt_CSSBasic` (Gestalt code `TBA`). You can also make a preprocessor test for `GLK_MODULE_CSS_BASIC`.
@@ -31,7 +33,7 @@ void glk_css_hint_set_clear(glui32 wintype, glui32 styl, glui32 par_or_span,
 #define CSS_Paragraph (1)
 ```
 
-There are two sets of functions, for paragraph and span styles. These allow you to set CSS for entire paragraphs (only being applied if the style is the first style of a paragraph), or span styles for within a paragraph. Note that "paragraph" here refers to blocks of text broken by line break characters, not blank lines.
+These functions allow you to set CSS for entire paragraphs (only being applied if the style is the first style of a paragraph), or span styles for within a paragraph. Note that "paragraph" here refers to blocks of text broken by line break characters, not blank lines.
 
 The `wintype` and `styl` have the same meanings as in the Glk stylehint functions. `par_or_span` specifies whether the style should be set on paragraphs or styles. `prop` and `proplen` specify a buffer giving the text of the CSS property. The value can either be given as another buffer, or as a signed number.
 
