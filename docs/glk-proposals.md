@@ -4,6 +4,85 @@ layout: default
 
 # Glk Extension Proposals
 
+## CSS
+
+These functions allow you to set arbitrary CSS styles. While of most use in a HTML-based interpreter, some non-HTML interpreters may supported small text formatting subsets of CSS.
+
+Support for these functions can be tested with `gestalt_CSSBasic` (Gestalt code `TBA`). You can also make a preprocessor test for `GLK_MODULE_CSS_BASIC`.
+
+In these functions buffers refer to UTF-8 byte arrays. Most CSS only needs ASCII, so you usually won't need to worry about UTF-8 encoding. But if you need non-ASCII characters, you can use the [UTF-8 encoding/decoding functions](#utf-8-encodingdecoding).
+
+### Window CSS hints
+
+These functions allow you to set arbitrary CSS styles *before* opening a window, in the manner of the [standard Glk stylehints](https://eblong.com/zarf/glk/Glk-Spec-075.html#stream_style_hints).
+
+```c
+// Function code: TBA
+void glk_css_hint_set(glui32 wintype, glui32 styl, glui32 par_or_span, char *prop, glui32 proplen, char *val, glui32 vallen);
+// Function code: TBA
+void glk_css_hint_set_num(glui32 wintype, glui32 styl, glui32 par_or_span, char *prop, glui32 proplen, glsi32 val);
+// Function code: TBA
+void glk_css_hint_set_clear(glui32 wintype, glui32 styl, glui32 par_or_span, char *prop, glui32 proplen);
+
+#define CSS_Span (0)
+#define CSS_Paragraph (1)
+```
+
+There are two sets of functions, for paragraph and span styles. These allow you to set CSS for entire paragraphs (only being applied if the style is the first style of a paragraph), or span styles for within a paragraph. Note that "paragraph" here refers to blocks of text broken by line break characters, not blank lines.
+
+The `wintype` and `styl` have the same meanings as in the Glk stylehint functions. `par_or_span` specifies whether the style should be set on paragraphs or styles. `prop` and `proplen` specify a buffer giving the text of the CSS property. The value can either be given as another buffer, or as a signed number.
+
+```c
+// Function code: TBA
+void glk_css_hint_selector_set(char *sel, glui32 sellen, char *prop, glui32 proplen, char *val, glui32 vallen);
+// Function code: TBA
+void glk_css_hint_selector_set_num(char *sel, glui32 sellen, char *prop, glui32 proplen, glsi32 val);
+// Function code: TBA
+void glk_css_hint_selector_set_clear(char *sel, glui32 sellen, char *prop, glui32 proplen);
+```
+
+These functions are for manually specifying the selector of a CSS rule. They are still scoped to a window, so send an empty `sel` buffer to target the window itself. If you want to replicate the standard paragraph and span selectors, they are specified as classes for each Glk style, with `_para` appended for paragraph styles. (The capitalisation is unfortunately the opposite of how they are in Glk.) Note that the `.` must be manually included.
+
+| Glk style | Class |
+|-------|-------|
+| style_Normal | Style_normal |
+| style_Emphasized | Style_emphasized |
+| style_Preformatted | Style_preformatted |
+| style_Header | Style_header |
+| style_Subheader | Style_subheader |
+| style_Alert | Style_alert |
+| style_Note | Style_note |
+| style_BlockQuote | Style_blockquote |
+| style_Input | Style_input |
+| style_User1 | Style_user1 |
+| style_User2 | Style_user2 |
+
+### Inline CSS styles
+
+These functions allow you to specify inline CSS styles. They are a generalisation of the [Gargoyle text formatting extensions](gargoyle.md#text-formatting). As these are inline styles it only makes sense to set CSS properties that apply to spans.
+
+```c
+// Function code: TBA
+void glk_css_inline_set(char *prop, glui32 proplen, char *val, glui32 vallen);
+// Function code: TBA
+void glk_css_inline_set_num(char *prop, glui32 proplen, glsi32 val);
+// Function code: TBA
+void glk_css_inline_set_clear(char *prop, glui32 proplen);
+```
+
+### Non-standard CSS properties
+
+A few properties are supported that are not part of CSS. While standard CSS properties could be used, it is recommended that these properties be used for maximum portability. Both of these properties should only be used for spans, they may not have any effect, or may misbehave, if set on paragraphs.
+
+| Property | Function |
+|----------|----------|
+| monospace | Sets text to be monospaced, by adding the class `monospace` to the span. |
+| reverse | Enables reverse mode (as the [reverse functions do](gargoyle.md#reverse-mode)). If you also provide colours, then do not preemptively reverse them. For example: `background-color: #FFF, color: #000, reverse: 1` will be displayed as white text on a black background. |
+
+### Future
+
+Functions for testing and measuring CSS styles may be added in the future.
+
 ## Pixel Ratio
 
 [Forum discussion](https://intfiction.org/t/glk-extension-proposal-pixel-ratio/59550)
