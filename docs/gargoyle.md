@@ -50,7 +50,15 @@ These functions set the reverse mode. Pass a non-zero `reverse` parameter to ena
 
 Unlike colours, reverse mode stylehints do interact with these functions: reverse mode will be used if either the current style has a stylehint enabling it, or if it has been enabled by these functions. When stylehints enable reverse mode, you cannot call `garglk_set_reversevideo` to disable it; you can only disable reverse mode by switching to another style.
 
-## garglk_fileref_get_name
+## garglk_fileref_get_name (deprecated)
+
+This function has been deprecated in favour of this glkunix function, with preprocessor macro `GLKUNIX_FILEREF_GET_FILENAME`:
+
+```c
+const char *glkunix_fileref_get_filename(frefid_t fref);
+```
+
+---------------
 
 This function is required by the Glk ports of several interpreters. It returns a C string of the fileref's internal filename. In most implementations no transformation or sanitation of the filename should be required.
 
