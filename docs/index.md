@@ -16,6 +16,10 @@ layout: default
  - [Other proposals](glk-proposals.md)
  - [Out-of-band messaging (proposal)](outofband.md)
 
+### Other proposals
+
+ - [Version autosaves](autosaves.md)
+
 ### Z-Machine
 
  - [The Z-Machine Standard 1.2 (draft)](zspec12.md)
