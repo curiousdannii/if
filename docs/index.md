@@ -18,7 +18,7 @@ layout: default
 
 ### Other proposals
 
- - [Version autosaves](autosaves.md)
+ - [Versioned autosaves](autosaves.md)
 
 ### Z-Machine
 
