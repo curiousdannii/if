@@ -6,7 +6,7 @@ layout: default
 
 ## Additional styles
 
-[Forum discussion]()
+[Forum discussion](https://intfiction.org/t/glk-extension-proposals-extra-styles-and-open-url/79698)
 
 Glk is limited to 11 styles, but there is little technical reason for this. This extension raises that number to 255. Additional styles are referred to with their number, so style 11 is `style_User11` (or `Style_user11` in GlkOte), not `style_User3`.
 
@@ -105,7 +105,7 @@ Functions for testing and measuring CSS styles may be added in the future.
 
 ## Open URL
 
-[Forum discussion]()
+[Forum discussion](https://intfiction.org/t/glk-extension-proposals-extra-styles-and-open-url/79698)
 
 Many authors would like to be able to open a URL from their games. Some interpreters will autolinkify a URL that has been printed, but not all, and that necessitates printing the entire URL. This function allows authors to directly open a URL.
 
