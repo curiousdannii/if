@@ -4,6 +4,16 @@ layout: default
 
 # Glk Extension Proposals
 
+## Additional styles
+
+[Forum discussion]()
+
+Glk is limited to 11 styles, but there is little technical reason for this. This extension raises that number to 255. Additional styles are referred to with their number, so style 11 is `style_User11` (or `Style_user11` in GlkOte), not `style_User3`.
+
+Support for additional styles can be tested with `gestalt_ExtraStyles` (Gestalt code `TBA`). You can also make a preprocessor test for `GLK_MODULE_EXTRA_STYLES`.
+
+Affected functions: `glk_set_style`, `glk_set_style_stream`, `glk_style_distinguish`, `glk_style_measure`, `glk_stylehint_clear`, `glk_stylehint_set`.
+
 ## CSS
 
 [Forum discussion](https://intfiction.org/t/glk-extension-proposal-css/66228)
@@ -28,6 +38,8 @@ void glk_css_hint_set_num(glui32 wintype, glui32 styl, glui32 par_or_span,
 // Function code: TBA
 void glk_css_hint_clear(glui32 wintype, glui32 styl, glui32 par_or_span,
     char *prop, glui32 proplen);
+// Function code: TBA
+void glk_css_hint_clear_all(glui32 wintype, glui32 styl);
 
 #define CSS_Span (0)
 #define CSS_Paragraph (1)
@@ -91,6 +103,21 @@ A few properties are supported that are not part of CSS. While standard CSS prop
 
 Functions for testing and measuring CSS styles may be added in the future.
 
+## Open URL
+
+[Forum discussion]()
+
+Many authors would like to be able to open a URL from their games. Some interpreters will autolinkify a URL that has been printed, but not all, and that necessitates printing the entire URL. This function allows authors to directly open a URL.
+
+Support for this function can be tested with `gestalt_OpenURL` (Gestalt code `TBA`). You can also make a preprocessor test for `GLK_MODULE_OPEN_URL`.
+
+```c
+// Function code: TBA
+void glk_open_url(char *url, glui32 urllen);
+```
+
+The URL must be ASCII (pre-encode any higher character codes). Only one URL can be opened per input cycle; opening a second will replace the first. You should only attempt to open a URL in response to player action as web interpreters are restricted (so don't open a URL in response to a timer event.)
+
 ## Pixel Ratio
 
 [Forum discussion](https://intfiction.org/t/glk-extension-proposal-pixel-ratio/59550)
@@ -122,9 +149,11 @@ Note that window arrangements *cannot* use physical pixels. If you have switched
 
 ## UTF-8 Encoding/decoding
 
+[Forum discussion](https://intfiction.org/t/glk-extension-proposal-css/66228)
+
 These two functions encode/decode between Glk's UTF-32 arrays, and UTF-8 byte arrays.
 
-Support for these functions can be tested with `gestalt_Utf8` (Gestalt code `TBA`). You can also make a preprocessor test for `GLK_MODULE_UTF8`.
+Support for these functions can be tested with `gestalt_UTF8` (Gestalt code `TBA`). You can also make a preprocessor test for `GLK_MODULE_UTF8`.
 
 ```c
 // Function code: TBA
@@ -133,4 +162,4 @@ glui32 glk_encode_utf8(glui32 *src, glui32 srclen, char *dest, glui32 destlen);
 glui32 glk_decode_utf8(char *src, glui32 srclen, glui32 *dest, glui32 destlen);
 ```
 
-Each function takes a source buffer and a destination buffer. The source buffer length is the actual length of its text, the destination buffer length is its maximum capacity. Like the standard Glk text conversion functions, it is possible the result might be longer than the destination buffer. If this is the case the result will be truncated to fit in the buffer, and the function will return what the length should have been.
+Each function takes a source buffer and a destination buffer. The source buffer length is the actual length of its text, the destination buffer length is its maximum capacity. Like the standard Glk text conversion functions, it is possible the result might be longer than the destination buffer. If this is the case the result will be truncated to fit in the buffer, and the function will return what the length should have been. If there was an encoding/decoding error, then the function will return `-1` and the destination buffer's contents will be undefined.
