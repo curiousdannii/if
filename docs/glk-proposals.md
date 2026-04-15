@@ -108,7 +108,7 @@ void glk_set_hyperlink_external(char *url, glui32 urllen);
 void glk_set_hyperlink_external_stream(strid_t str, char *url, glui32 urllen);
 ```
 
-The URL must be ASCII (pre-encode any higher character codes). Like standard hyperlinks only one can be active at a time, so calling any hyperlink function will end this hyperlink. Clicking on an eternal hyperlink will not general a Glk event.
+The URL must be ASCII (pre-encode any higher character codes). Like standard hyperlinks only one can be active at a time, so calling any hyperlink function will end this hyperlink. Clicking on an eternal hyperlink will not generate a Glk event.
 
 ## Pixel Ratio
 
