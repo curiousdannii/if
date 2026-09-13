@@ -10,7 +10,7 @@ layout: default
 
 These functions allow you to set arbitrary CSS styles. While of most use in a HTML-based interpreter, some non-HTML interpreters may supported small text formatting subsets of CSS.
 
-Support for these functions can be tested with `gestalt_CSSBasic` (Gestalt code `TBA`). You can also make a preprocessor test for `GLK_MODULE_CSS_BASIC`.
+Support for these functions can be tested with `gestalt_CSSBasic` (Gestalt code `0x1110`). You can also make a preprocessor test for `GLK_MODULE_CSS_BASIC`.
 
 In these functions buffers refer to UTF-8 byte arrays. Most CSS only needs ASCII, so you usually won't need to worry about UTF-8 encoding. But if you need non-ASCII characters, you can use the [UTF-8 encoding/decoding functions](#utf-8-encodingdecoding).
 
@@ -19,17 +19,15 @@ In these functions buffers refer to UTF-8 byte arrays. Most CSS only needs ASCII
 These functions allow you to set arbitrary CSS styles *before* opening a window, in the manner of the [standard Glk stylehints](https://eblong.com/zarf/glk/Glk-Spec-075.html#stream_style_hints).
 
 ```c
-// Function code: TBA
-void glk_css_hint_set(glui32 wintype, glui32 styl, glui32 par_or_span,
-    char *prop, glui32 proplen, char *val, glui32 vallen);
-// Function code: TBA
-void glk_css_hint_set_num(glui32 wintype, glui32 styl, glui32 par_or_span,
-    char *prop, glui32 proplen, glsi32 val);
-// Function code: TBA
-void glk_css_hint_clear(glui32 wintype, glui32 styl, glui32 par_or_span,
-    char *prop, glui32 proplen);
-// Function code: TBA
-void glk_css_hint_clear_all(glui32 wintype, glui32 styl);
+// Function code: 0x1110
+void glk_css_hint_set(glui32 wintype, glui32 styl, glui32 span_or_par,
+    const char *prop, glui32 proplen, const char *val, glui32 vallen);
+// Function code: 0x1111
+void glk_css_hint_set_num(glui32 wintype, glui32 styl, glui32 span_or_par,
+    const char *prop, glui32 proplen, glsi32 val);
+// Function code: 0x1112
+void glk_css_hint_clear(glui32 wintype, glui32 styl, glui32 span_or_par,
+    const char *prop, glui32 proplen);
 
 #define CSS_Span (0)
 #define CSS_Paragraph (1)
@@ -37,18 +35,18 @@ void glk_css_hint_clear_all(glui32 wintype, glui32 styl);
 
 These functions allow you to set CSS for entire paragraphs (only being applied if the style is the first style of a paragraph), or span styles for within a paragraph. Note that "paragraph" here refers to blocks of text broken by line break characters, not blank lines.
 
-The `wintype` and `styl` have the same meanings as in the Glk stylehint functions. `par_or_span` specifies whether the style should be set on paragraphs or styles. `prop` and `proplen` specify a buffer giving the text of the CSS property. The value can either be given as another buffer, or as a signed number.
+The `wintype` and `styl` have the same meanings as in the Glk stylehint functions. `span_or_par` specifies whether the style should be set on paragraphs or spans. `prop` and `proplen` specify a buffer giving the text of the CSS property. The value can either be given as another buffer, or as a signed number.
 
 ```c
-// Function code: TBA
-void glk_css_hint_selector_set(glui32 wintype, char *sel, glui32 sellen,
-    char *prop, glui32 proplen, char *val, glui32 vallen);
-// Function code: TBA
-void glk_css_hint_selector_set_num(glui32 wintype, char *sel, glui32 sellen,
-    char *prop, glui32 proplen, glsi32 val);
-// Function code: TBA
-void glk_css_hint_selector_clear(glui32 wintype, char *sel, glui32 sellen,
-    char *prop, glui32 proplen);
+// Function code: 0x1113
+void glk_css_hint_selector_set(glui32 wintype, const char *sel, glui32 sellen,
+    const char *prop, glui32 proplen, const char *val, glui32 vallen);
+// Function code: 0x1114
+void glk_css_hint_selector_set_num(glui32 wintype, const char *sel, glui32 sellen,
+    const char *prop, glui32 proplen, glsi32 val);
+// Function code: 0x1115
+void glk_css_hint_selector_clear(glui32 wintype, const char *sel, glui32 sellen,
+    const char *prop, glui32 proplen);
 ```
 
 These functions are for manually specifying the selector of a CSS rule. They are still scoped to a window, so send an empty `sel` buffer to target the window itself. If you want to replicate the standard paragraph and span selectors, they are specified as classes for each Glk style, with `_para` appended for paragraph styles. (The capitalisation is unfortunately the opposite of how they are in Glk.) Note that the `.` must be manually included.
@@ -69,25 +67,43 @@ These functions are for manually specifying the selector of a CSS rule. They are
 
 ### Inline CSS styles
 
-These functions allow you to specify inline CSS styles. They are a generalisation of the [Gargoyle text formatting extensions](gargoyle.md#text-formatting). As these are inline styles it only makes sense to set CSS properties that apply to spans.
+These functions allow you to specify inline CSS styles. They are a generalisation of the [Gargoyle text formatting extensions](gargoyle.md#text-formatting). Inline paragraph styles will be applied after the next line break is output.
 
 ```c
-// Function code: TBA
-void glk_css_inline_set(char *prop, glui32 proplen, char *val, glui32 vallen);
-// Function code: TBA
-void glk_css_inline_set_num(char *prop, glui32 proplen, glsi32 val);
-// Function code: TBA
-void glk_css_inline_clear(char *prop, glui32 proplen);
+// Function code: 0x1116
+void glk_css_inline_set(glui32 span_or_par, const char *prop, glui32 proplen,
+    const char *val, glui32 vallen);
+// Function code: 0x1117
+void glk_css_inline_set_num(glui32 span_or_par, const char *prop, glui32 proplen,
+    glsi32 val);
+// Function code: 0x1118
+void glk_css_inline_clear(glui32 span_or_par, const char *prop, glui32 proplen);
 ```
 
-### Non-standard CSS properties
+### Clearing styles en masse
 
-A few properties are supported that are not part of CSS. While standard CSS properties could be used, it is recommended that these properties be used for maximum portability. Both of these properties should only be used for spans, they may not have any effect, or may misbehave, if set on paragraphs.
+```c
+// Function code: 0x1119
+void glk_css_hint_clear_all_by_style(glui32 wintype, glui32 styl);
+// Function code: 0x111A
+void glk_css_hint_clear_all_by_selector(glui32 wintype, const char *sel,
+    glui32 sellen);
+// Function code: 0x111B
+void glk_css_hint_clear_all_by_window(glui32 wintype);
+// Function code: 0x111C
+void glk_css_hint_clear_all_inline();
+```
 
-| Property | Function |
-|----------|----------|
-| monospace | Sets text to be monospaced, by adding the class `monospace` to the span. |
-| reverse | Enables reverse mode (as the [reverse functions do](gargoyle.md#reverse-mode)). If you also provide colours, then do not preemptively reverse them. For example: `background-color: #FFF, color: #000, reverse: 1` will be displayed as white text on a black background. |
+These functions allow you to clear styles en masse. Note that they will also clear stylehints set with `glk_stylehint_set`. If you pass `glk_css_hint_clear_all_by_selector` a selector for a standard class then it will clear styles set by `glk_css_hint_set`. `glk_css_hint_clear_all_by_window` will clear all styles for a window type. `glk_css_hint_clear_all_inline` will clear the styles set with the [Gargoyle text formatting extensions](gargoyle.md#text-formatting).
+
+### Properties with special behaviour
+
+A few properties may be interpretered specially by the library.
+
+| Property | Values | Function |
+|----------|--------|----------|
+| `font-family` | `monospace`, `monospace, monospace` | Sets text to be monospaced, possibly with additional processing. If you set additional font families with `monospace` as a fallback, or if you set `monospace` in a shorthand `font` style, the additional processing may not be performed. |
+| `-iftf-reverse-video` | `reverse`, `none` | Enables reverse mode (as the [reverse functions do](gargoyle.md#reverse-mode)). If you also provide colours, then do not preemptively reverse them. For example: `background-color: #FFF, color: #000, -iftf-reverse-video: reverse` will be displayed as white text on a black background. |
 
 ### Future
 
@@ -103,9 +119,9 @@ Support for these functions can be tested with `gestalt_ExternalHyperlinks` (Ges
 
 ```c
 // Function code: TBA
-void glk_set_hyperlink_external(char *url, glui32 urllen);
+void glk_set_hyperlink_external(const char *url, glui32 urllen);
 // Function code: TBA
-void glk_set_hyperlink_external_stream(strid_t str, char *url, glui32 urllen);
+void glk_set_hyperlink_external_stream(strid_t str, const char *url, glui32 urllen);
 ```
 
 The URL must be ASCII (pre-encode any higher character codes). Like standard hyperlinks only one can be active at a time, so calling any hyperlink function will end this hyperlink. Clicking on an eternal hyperlink will not generate a Glk event.
@@ -149,9 +165,9 @@ Support for these functions can be tested with `gestalt_UTF8` (Gestalt code `TBA
 
 ```c
 // Function code: TBA
-glui32 glk_encode_utf8(glui32 *src, glui32 srclen, char *dest, glui32 destlen);
+glui32 glk_encode_utf8(const glui32 *src, glui32 srclen, char *dest, glui32 destlen);
 // Function code: TBA
-glui32 glk_decode_utf8(char *src, glui32 srclen, glui32 *dest, glui32 destlen);
+glui32 glk_decode_utf8(const char *src, glui32 srclen, glui32 *dest, glui32 destlen);
 ```
 
 Each function takes a source buffer and a destination buffer. The source buffer length is the actual length of its text, the destination buffer length is its maximum capacity. Like the standard Glk text conversion functions, it is possible the result might be longer than the destination buffer. If this is the case the result will be truncated to fit in the buffer, and the function will return what the length should have been. If there was an encoding/decoding error, then the function will return `-1` and the destination buffer's contents will be undefined.
